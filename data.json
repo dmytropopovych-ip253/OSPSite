@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Апартаменти з дизайнерським LED-освітленням",
+    "rooms": "1 кімната",
+    "address": "вулиця Незалежності, 115",
+    "floor": "10\\10",
+    "price": "550$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3020843/69cc85fab6f2d.jpg"
+  },
+  {
+    "title": "Світла квартира в стилі мінімалізм",
+    "rooms": "2 кімнати",
+    "address": "вулиця Михайла Мулика",
+    "floor": "4\\7",
+    "price": "480$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3069974/69cc860ec82a1.jpg"
+  },
+  {
+    "title": "Студія з панорамними вікнами у бізнес-центрі",
+    "rooms": "1 кімната",
+    "address": "вулиця Мазепи, 144",
+    "floor": "15\\16",
+    "price": "650$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3069970/69cc860ac7c68.jpg"
+  },
+  {
+    "title": "Затишна квартира з ергономічною кухнею",
+    "rooms": "1 кімната",
+    "address": "вулиця Вовчинецька, 12",
+    "floor": "5\\9",
+    "price": "350$",
+    "image": "https://www.orenda.if.ua/storage/app/uploads/public/61e/be4/255/61ebe4255eab3847466822.jpg"
+  },
+  {
+    "title": "Преміальні апартаменти з високими стелями",
+    "rooms": "3 кімнати",
+    "address": "вулиця Січових Стрільців, 8",
+    "floor": "2\\4",
+    "price": "1200$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3069967/69cc860995132.jpg"
+  },
+  {
+    "title": "Ультрасучасна кухня в стилі Hi-Tech",
+    "rooms": "2 кімнати",
+    "address": "вулиця Національної Гвардії, 3",
+    "floor": "3\\10",
+    "price": "850$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3069973/69cc860ce10c4.jpg"
+  },
+  {
+    "title": "Проста та простора вітальня для родини",
+    "rooms": "3 кімнати",
+    "address": "вулиця Чорновола, 22",
+    "floor": "7\\12",
+    "price": "700$",
+    "image": "https://storage.rem.ua/enot/external/lun_ivano_frankovsk/objects/images/apartments-rent/3069964/69cc86076b03e.jpg"
+  },
+  {
+    "title": "Лаконічний інтер'єр з акцентом на простір",
+    "rooms": "2 кімнати",
+    "address": "вулиця Довженка, 5",
+    "floor": "4\\10",
+    "price": "600$",
+    "image": "https://www.orenda.if.ua/storage/app/uploads/public/65d/4a3/1c8/65d4a31c897af273619049.webp"
+  },
+  {
+    "title": "Компактна та функціональна смарт-квартира",
+    "rooms": "1 кімната",
+    "address": "вулиця Пасічна, 33",
+    "floor": "8\\10",
+    "price": "320$",
+    "image": "https://www.orenda.if.ua/storage/app/uploads/public/671/7b8/b70/6717b8b70c408460886681.jpeg"
+  }
+]

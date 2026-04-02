@@ -38,7 +38,7 @@ function render(data) {
                     <div class="info-line"><span class="label">Поверх:</span> <span class="val">${item.floor}</span></div>
                 </div>
                 <div class="card-footer">
-                    <div class="price">${item.price}</div>
+                    <div class="price">${item.price}$</div>
                     <button class="buy-btn">Орендувати</button>
                 </div>
             </div>`;
@@ -72,8 +72,8 @@ document.querySelectorAll('.sort-dropdown .sort-option').forEach(option => {
         const sortType = option.dataset.sort;
         document.getElementById('currentSort').innerText = option.innerText;
         let sorted = [...allData];
-        if (sortType === 'cheap') sorted.sort((a, b) => parseInt(a.price.replace(/\D/g, '')) - parseInt(b.price.replace(/\D/g, '')));
-        if (sortType === 'expensive') sorted.sort((a, b) => parseInt(b.price.replace(/\D/g, '')) - parseInt(a.price.replace(/\D/g, '')));
+        if (sortType === 'cheap') sorted.sort((a, b) => a.price - b.price);
+        if (sortType === 'expensive') sorted.sort((a, b) => b.price - a.price);
         render(sorted);
         [sortPanel, sortWrapper].forEach(el => el.classList.remove('active'));
     };
@@ -132,3 +132,60 @@ document.onclick = (e) => {
     if (e.target === authOverlay) authOverlay.classList.remove('active');
 };
 updateAuthUI();
+
+let currentSort = 'current'; 
+function applyFiltersAndSort() {
+    let result = [...allData];
+    const activeRoomButtons = document.querySelectorAll('.room-btn.active');
+    const selectedRooms = Array.from(activeRoomButtons).map(btn => btn.innerText.trim());
+    if (selectedRooms.length > 0) {
+        result = result.filter(item => {
+            const roomCount = item.rooms.charAt(0);
+            return selectedRooms.includes(roomCount);
+        });
+    }
+    const priceFrom = document.getElementById('priceFrom');
+    const priceTo = document.getElementById('priceTo');
+    if (priceFrom && priceTo && (priceFrom.value || priceTo.value)) {
+        const minPrice = parseFloat(priceFrom.value) || 0;
+        const maxPrice = parseFloat(priceTo.value) || Infinity;
+        result = result.filter(item => {
+            const itemPrice = parseFloat(item.price);
+            return itemPrice >= minPrice && itemPrice <= maxPrice;
+        });
+    }
+    if (currentSort === 'cheap') {
+        result.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    } else if (currentSort === 'expensive') {
+        result.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+    }
+    render(result);
+}
+
+// 
+
+roomButtons.forEach(btn => {
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        btn.classList.toggle('active');
+        applyFiltersAndSort();
+    };
+});
+const applyFiltersBtn = document.getElementById('applyFilters');
+if (applyFiltersBtn) {
+    applyFiltersBtn.onclick = () => {
+        applyFiltersAndSort();
+        filterPanel.classList.remove('active');
+    };
+}
+document.querySelectorAll('.sort-dropdown .sort-option').forEach(option => {
+    option.onclick = () => {
+        currentSort = option.dataset.sort; 
+        const currentSortEl = document.getElementById('currentSort');
+        if (currentSortEl) {
+            currentSortEl.innerText = option.innerText;
+        }
+        applyFiltersAndSort(); 
+        [sortPanel, sortWrapper].forEach(el => el.classList.remove('active'));
+    };
+});

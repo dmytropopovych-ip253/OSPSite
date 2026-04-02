@@ -54,8 +54,11 @@ body {
 }
 .header-content {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 .header h1 {
     font-size: 50px;
@@ -64,10 +67,11 @@ body {
 }
 .controls-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     position: relative;
-    width: 100%;
+    width: auto;
+    gap: 20px;
 }
 .filter-buttons-left {
     display: flex;

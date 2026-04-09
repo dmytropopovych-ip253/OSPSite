@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін Панель - STRIVE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-page { padding: 40px 20px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-top: 40px;}
+        .admin-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .admin-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
+        .admin-table img { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .action-btn { padding: 6px 12px; border: none; cursor: pointer; border-radius: 4px; color: white; font-size: 13px; margin-right: 5px; }
+        .edit-btn { background-color: #3d7f99; }
+        .delete-btn { background-color: #e54f4f; }
+        .add-btn { background-color: #4fe5c6; padding: 10px 20px; border: none; color: white; cursor: pointer; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-wrapper">
+        <div class="logo">STRIVE <span>Адмін Панель</span></div>
+        <a href="search.html" style="text-decoration: none; font-weight: bold; color: var(--brand-color);">← Повернутися на сайт</a>
+    </div>
+</nav>
+
+<div class="container admin-page">
+    
+    <div class="admin-header">
+        <h2>Користувачі</h2>
+        <button class="add-btn" onclick="openUserModal()">+ Додати користувача</button>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="admin-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>Логін</th>
+                    <th>Email</th>
+                    <th>Пароль</th>
+                    <th>Роль</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="admin-header">
+        <h2>Квартири</h2>
+        <button class="add-btn" onclick="openAptModal()">+ Додати квартиру</button>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="admin-table" id="aptsTable">
+            <thead>
+                <tr>
+                    <th>Фото</th>
+                    <th>Назва</th>
+                    <th>Ціна</th>
+                    <th>Адреса</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-overlay" id="userModal">
+    <div class="auth-modal">
+        <button class="close-btn" onclick="closeModal('userModal')">&#10006;</button>
+        <h2 id="userModalTitle">Додати користувача</h2>
+        <div class="auth-form">
+            <input type="hidden" id="oldUserLogin">
+            <input type="text" id="userLogin" placeholder="Логін" required>
+            <input type="email" id="userEmail" placeholder="Email">
+            <input type="text" id="userPassword" placeholder="Пароль" required>
+            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <input type="checkbox" id="userIsAdmin"> Це адміністратор
+            </label>
+            <button class="auth-action-btn primary" onclick="saveUser()">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="aptModal">
+    <div class="auth-modal">
+        <button class="close-btn" onclick="closeModal('aptModal')">&#10006;</button>
+        <h2 id="aptModalTitle">Додати квартиру</h2>
+        <div class="auth-form">
+            <input type="hidden" id="aptId">
+            <input type="text" id="aptTitle" placeholder="Заголовок" required>
+            <input type="text" id="aptRooms" placeholder="Кімнати (напр. 2 кімнати)" required>
+            <input type="text" id="aptAddress" placeholder="Адреса" required>
+            <input type="text" id="aptFloor" placeholder="Поверх" required>
+            <input type="number" id="aptPrice" placeholder="Ціна ($)" required>
+            <input type="text" id="aptImage" placeholder="Посилання на фото" required>
+            <button class="auth-action-btn primary" onclick="saveApt()">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || !currentUser.isAdmin) {
+        alert('Доступ заборонено! Ви не адміністратор.');
+        window.location.href = 'search.html';
+    }
+
+    let accounts = JSON.parse(localStorage.getItem('myAppAccounts')) || [];
+    let apartments = JSON.parse(localStorage.getItem('apartmentsData')) || [];
+
+    function renderTables() {
+        const usersTbody = document.querySelector('#usersTable tbody');
+        usersTbody.innerHTML = '';
+        accounts.forEach(acc => {
+            usersTbody.innerHTML += `
+                <tr>
+                    <td>${acc.login}</td>
+                    <td>${acc.email || '-'}</td>
+                    <td>${acc.password}</td>
+                    <td>${acc.isAdmin ? '<b>Адмін</b>' : 'Користувач'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editUser('${acc.login}')">Редаг.</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('${acc.login}')">Видал.</button>
+                    </td>
+                </tr>`;
+        });
+
+        const aptsTbody = document.querySelector('#aptsTable tbody');
+        aptsTbody.innerHTML = '';
+        apartments.forEach(apt => {
+            aptsTbody.innerHTML += `
+                <tr>
+                    <td><img src="${apt.image}" alt="img"></td>
+                    <td>${apt.title}</td>
+                    <td>${apt.price} $</td>
+                    <td>${apt.address}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editApt('${apt.id}')">Редаг.</button>
+                        <button class="action-btn delete-btn" onclick="deleteApt('${apt.id}')">Видал.</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function openUserModal() {
+        document.getElementById('userModalTitle').innerText = 'Додати користувача';
+        document.getElementById('oldUserLogin').value = '';
+        document.getElementById('userLogin').value = '';
+        document.getElementById('userEmail').value = '';
+        document.getElementById('userPassword').value = '';
+        document.getElementById('userIsAdmin').checked = false;
+        document.getElementById('userModal').classList.add('active');
+    }
+
+    function editUser(login) {
+        const user = accounts.find(u => u.login === login);
+        if (!user) return;
+        document.getElementById('userModalTitle').innerText = 'Редагувати користувача';
+        document.getElementById('oldUserLogin').value = user.login;
+        document.getElementById('userLogin').value = user.login;
+        document.getElementById('userEmail').value = user.email || '';
+        document.getElementById('userPassword').value = user.password;
+        document.getElementById('userIsAdmin').checked = user.isAdmin || false;
+        document.getElementById('userModal').classList.add('active');
+    }
+
+    function saveUser() {
+        const oldLogin = document.getElementById('oldUserLogin').value;
+        const newLogin = document.getElementById('userLogin').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        const password = document.getElementById('userPassword').value.trim();
+        const isAdmin = document.getElementById('userIsAdmin').checked;
+
+        if (!newLogin || !password) return alert('Логін та пароль обов\'язкові!');
+
+        if (oldLogin) {
+            const index = accounts.findIndex(u => u.login === oldLogin);
+            if (index !== -1) {
+                if (oldLogin !== newLogin && accounts.some(u => u.login === newLogin)) return alert('Цей логін вже зайнятий!');
+                accounts[index] = { login: newLogin, email, password, isAdmin };
+            }
+        } else {
+            if (accounts.some(u => u.login === newLogin)) return alert('Користувач з таким логіном вже існує!');
+            accounts.push({ login: newLogin, email, password, isAdmin });
+        }
+
+        localStorage.setItem('myAppAccounts', JSON.stringify(accounts));
+        closeModal('userModal');
+        renderTables();
+    }
+
+    function deleteUser(login) {
+        if (login === currentUser.login) return alert('Ви не можете видалити самі себе!');
+        if (confirm(`Видалити користувача ${login}?`)) {
+            accounts = accounts.filter(u => u.login !== login);
+            localStorage.setItem('myAppAccounts', JSON.stringify(accounts));
+            renderTables();
+        }
+    }
+
+    function openAptModal() {
+        document.getElementById('aptModalTitle').innerText = 'Додати квартиру';
+        document.getElementById('aptId').value = '';
+        document.getElementById('aptTitle').value = '';
+        document.getElementById('aptRooms').value = '';
+        document.getElementById('aptAddress').value = '';
+        document.getElementById('aptFloor').value = '';
+        document.getElementById('aptPrice').value = '';
+        document.getElementById('aptImage').value = '';
+        document.getElementById('aptModal').classList.add('active');
+    }
+
+    function editApt(id) {
+        const apt = apartments.find(a => a.id === id);
+        if (!apt) return;
+        document.getElementById('aptModalTitle').innerText = 'Редагувати квартиру';
+        document.getElementById('aptId').value = apt.id;
+        document.getElementById('aptTitle').value = apt.title;
+        document.getElementById('aptRooms').value = apt.rooms;
+        document.getElementById('aptAddress').value = apt.address;
+        document.getElementById('aptFloor').value = apt.floor;
+        document.getElementById('aptPrice').value = apt.price;
+        document.getElementById('aptImage').value = apt.image;
+        document.getElementById('aptModal').classList.add('active');
+    }
+
+    function saveApt() {
+        const id = document.getElementById('aptId').value;
+        const newApt = {
+            id: id ? id : Date.now().toString(),
+            title: document.getElementById('aptTitle').value,
+            rooms: document.getElementById('aptRooms').value,
+            address: document.getElementById('aptAddress').value,
+            floor: document.getElementById('aptFloor').value,
+            price: document.getElementById('aptPrice').value,
+            image: document.getElementById('aptImage').value
+        };
+
+        if (!newApt.title || !newApt.price || !newApt.image) return alert("Заповніть хоча б заголовок, ціну та фото!");
+
+        if (id) {
+            const index = apartments.findIndex(a => a.id === id);
+            if (index !== -1) apartments[index] = newApt;
+        } else {
+            apartments.unshift(newApt);
+        }
+
+        localStorage.setItem('apartmentsData', JSON.stringify(apartments));
+        closeModal('aptModal');
+        renderTables();
+    }
+
+    function deleteApt(id) {
+        if (confirm('Видалити цю квартиру?')) {
+            apartments = apartments.filter(a => a.id !== id);
+            localStorage.setItem('apartmentsData', JSON.stringify(apartments));
+            renderTables();
+        }
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    renderTables();
+</script>
+</body>
+</html>

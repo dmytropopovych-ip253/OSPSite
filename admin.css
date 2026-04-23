@@ -1,0 +1,19 @@
+.admin-page { padding: 40px 20px; min-height: 80vh; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 20px 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+.admin-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; margin-bottom: 40px; }
+.admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+.admin-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
+.admin-table img { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
+        
+.admin-table th:last-child, .admin-table td:last-child { text-align: center !important; white-space: nowrap; width: 150px; }
+        
+.action-btn { padding: 7px 14px; border: none; cursor: pointer; border-radius: 4px; color: white; font-size: 13px; margin: 2px; transition: opacity 0.2s; }
+.edit-btn { background-color: #3d7f99; }
+.delete-btn { background-color: #e54f4f; }
+.action-btn:hover { opacity: 0.8; }
+        
+.add-btn { background-color: #4fe5c6; padding: 10px 20px; border: none; color: white; cursor: pointer; border-radius: 5px; font-weight: bold; transition: transform 0.2s; }
+.add-btn:hover { transform: translateY(-2px); }
+        
+.msg-text { max-width: 350px; font-size: 14px; color: #555; line-height: 1.4; }
+.empty-row { text-align: center !important; padding: 40px !important; color: #999; }

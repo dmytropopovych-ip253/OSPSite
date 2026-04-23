@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STRIVE — Пошук квартир</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css">     <link rel="stylesheet" href="apartment.css"> </head>
 <body>
-
 <nav class="navbar">
     <div class="container nav-wrapper">
         <div class="logo">STRIVE <span>Оренда житла</span></div>
@@ -45,46 +38,6 @@
     <div class="container">
         <div class="header-content">
             <h1>Пошук квартир</h1>
-            
-            <div class="controls-row">
-                <div class="filter-buttons-left">
-                    <div class="filter-wrapper">
-                        <button id="openFilters" class="pill-btn">
-                            <svg class="icon-settings" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4V7H21V5h-6V3h-2v6h2z"></path></svg>
-                            Фільтри
-                        </button>
-                        
-                        <div id="filterPanel" class="dropdown-panel price-panel">
-                            <h3>Кількість кімнат</h3>
-                            <div class="rooms-row">
-                                <button class="room-btn">1</button>
-                                <button class="room-btn">2</button>
-                                <button class="room-btn">3</button>
-                                <button class="room-btn">4</button>
-                            </div>
-                            <h3>Ціна</h3>
-                            <div class="filter-row">
-                                <input type="number" id="priceFrom" placeholder="Від $">
-                                <input type="number" id="priceTo" placeholder="До $">
-                            </div>
-                            <button id="applyFilters" class="apply-btn">Застосувати</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sort-wrapper">
-                    <div class="sort-select-input" id="openSort">
-                        <span id="currentSort">За новизною</span>
-                        <svg class="icon-arrow" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>
-                    </div>
-                    <div id="sortPanel" class="dropdown-panel sort-dropdown">
-                        <div class="sort-option" data-sort="new">За новизною</div>
-                        <div class="sort-option" data-sort="cheap">Від дешевшої</div>
-                        <div class="sort-option" data-sort="expensive">Від дорожчої</div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="modal-overlay" id="authOverlay">
         <div class="auth-modal" id="authModal">
@@ -115,32 +68,14 @@
     </div>
 </header>
 
-<main class="container">
-    <div class="container">
-    <button id="addApartmentBtn" class="add-apt-btn" style="display: none;">+ Додати квартиру</button>
-</div>
-
-<section id="apartments" class="grid"></section>
-
-<div class="modal-overlay" id="apartmentModalOverlay">
-    <div class="auth-modal apartment-modal">
-        <button class="close-btn" id="closeApartmentModal">&#10006;</button>
-        <h2 id="apartmentModalTitle">Додати квартиру</h2>
-        <div class="auth-form">
-            <input type="hidden" id="aptId"> <input type="text" id="aptTitle" placeholder="Заголовок (напр. Світла квартира...)" required>
-            <input type="text" id="aptRooms" placeholder="Кімнати (напр. 2 кімнати)" required>
-            <input type="text" id="aptAddress" placeholder="Адреса" required>
-            <input type="text" id="aptFloor" placeholder="Поверх (напр. 4\7)" required>
-            <input type="number" id="aptPrice" placeholder="Ціна (лише цифри, напр. 550)" required>
-            <input type="text" id="aptImage" placeholder="Посилання на фото (https://...)" required>
-            <div class="auth-buttons">
-                <button type="button" id="saveApartmentBtn" class="auth-action-btn primary">Зберегти квартиру</button>
-            </div>
-        </div>
-    </div>
-</div>
-    <div id="pagination" class="pagination"></div>
-</main>
+    <main class="container apt-page-main">
+        <div id="mainAptContent"></div>
+        
+        <section class="recommendations">
+            <h2>Схожі варіанти</h2>
+            <div id="recommendGrid" class="recommend-grid"></div>
+        </section>
+    </main>
 
 <footer class="footer">
     <div class="container footer-content">
@@ -160,6 +95,5 @@
     </div>
 </footer>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>    <script src="apartment.js"></script> 
 </body>
-</html>

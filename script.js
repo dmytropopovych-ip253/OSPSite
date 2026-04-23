@@ -127,7 +127,7 @@ function render(data) {
                 </div>
                 <div class="card-footer" style="flex-wrap: wrap;">
                     <div class="price">${item.price} $</div>
-                    <button class="buy-btn">Орендувати</button>
+                    <button class="buy-btn" onclick="goToApartment(${allData.indexOf(item)})">Орендувати</button>
                     
                     <div class="admin-actions">
                         <button class="admin-btn edit-btn" onclick="editApartment('${item.id}')">Редагувати</button>
@@ -249,17 +249,34 @@ if (saveApartmentBtn) {
 }
 
 function updateAuthUI() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser) {
-        if (loginBtn) loginBtn.innerText = currentUser.login;
-        if (currentUser.isAdmin && adminControls) {
-            adminControls.style.display = 'flex';
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const loginBtn = document.getElementById('loginBtn');
+    const adminPanelLink = document.getElementById('adminPanelLink');
+
+    if (user) {
+        if (loginBtn) {
+            loginBtn.innerText = user.login;
+            loginBtn.href = "#";
+        }
+
+        if (user.isAdmin && adminPanelLink) {
+            adminPanelLink.style.display = 'block';
         }
     } else {
         if (loginBtn) loginBtn.innerText = 'Увійти';
-        if (adminControls) adminControls.style.display = 'none';
+        if (adminPanelLink) adminPanelLink.style.display = 'none';
     }
 }
+if (logoutBtn) {
+    logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        localStorage.removeItem('currentUser');
+        window.location.href = 'search.html';
+    };
+}
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+});
 
 if (loginBtn) {
     loginBtn.onclick = (e) => {
@@ -362,22 +379,33 @@ if (sendContactBtn) {
         const email = document.getElementById('contactEmail').value;
         const message = document.getElementById('contactMessage').value.trim();
 
-        if (!name || !email || !message) {
-            return alert('Будь ласка, заповніть всі поля.');
-        }
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!emailRegex.test(email)) {
-            return alert('Помилка! Введіть коректну пошту (наприклад: test@email.com)');
-        }
+        if (!name || !email || !message) return alert('Заповніть всі поля.');
+        if (!emailRegex.test(email)) return alert('Введіть коректну пошту!');
 
-        alert('Дякуємо, ' + name + '! Ваше повідомлення успішно відправлено.');
+        const messages = JSON.parse(localStorage.getItem('contactMessages')) || [];
+        
+        const newMessage = {
+            id: Date.now().toString(),
+            name: name,
+            email: email,
+            message: message,
+            date: new Date().toLocaleString('uk-UA')
+        };
+
+        messages.unshift(newMessage);
+        localStorage.setItem('contactMessages', JSON.stringify(messages));
+
+        alert('Дякуємо, ' + name + '! Повідомлення надіслано.');
         
         document.getElementById('contactName').value = '';
         document.getElementById('contactEmail').value = '';
         document.getElementById('contactMessage').value = '';
-        
         contactOverlay.classList.remove('active');
     };
 }
+window.goToApartment = function(index) {
+    const selectedApt = allData[index];
+    localStorage.setItem('selectedApartment', JSON.stringify(selectedApt));
+    window.location.href = 'apartment.html';
+};

@@ -12,7 +12,7 @@
 .delete-btn { background-color: #e54f4f; }
 .action-btn:hover { opacity: 0.8; }
         
-.add-btn { background-color: #4fe5c6; padding: 10px 20px; border: none; color: white; cursor: pointer; border-radius: 5px; font-weight: bold; transition: transform 0.2s; }
+.add-btn { background-color: #46bb8a; padding: 10px 20px; border: none; color: white; cursor: pointer; border-radius: 5px; font-weight: bold; transition: transform 0.2s; }
 .add-btn:hover { transform: translateY(-2px); }
         
 .msg-text { max-width: 350px; font-size: 14px; color: #555; line-height: 1.4; }

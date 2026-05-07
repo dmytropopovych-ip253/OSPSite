@@ -8,6 +8,11 @@
 </head>
 <body>
 
+<div id="site-preloader">
+    <div class="preloader-logo">STRIVE <span>Оренда житла</span></div>
+    <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
+</div>
+
 <nav class="navbar">
     <div class="container nav-wrapper">
         <div class="logo">STRIVE <span>Оренда житла</span></div>
@@ -28,8 +33,8 @@
                 <a href="#" id="loginBtn">Увійти</a>
                 
                 <div id="userDropdown" class="dropdown-panel profile-dropdown">
-                    <div class="sort-option">Профіль</div>
-                    <div class="sort-option">Настройки</div>
+                    <div class="sort-option" onclick="window.location.href='profile.html'">Профіль</div>
+                    <div class="sort-option" onclick="window.location.href='settings.html'">Настройки акаунта</div>
 
                     <div id="adminPanelLink" class="sort-option" style="display: none;" onclick="window.location.href='admin.html'">Адмін Панель</div>
     
@@ -90,13 +95,19 @@
         <div class="auth-modal" id="authModal">
             <button class="close-btn" id="closeAuth">&#10006;</button>
             <h2>Авторизація</h2>
+            <p class="modal-subtitle">Раді бачити вас знову!</p>
             <div class="auth-form">
-                <input type="email" id="authEmail" placeholder="Пошта" required>
+                <div class="register-only">
+                    <input type="email" id="authEmail" placeholder="Пошта (напр. test@email.com)">
+                </div>
                 <input type="text" id="authLogin" placeholder="Логін" required>
-                <input type="password" id="authPassword" placeholder="Пароль" required>
+                <input type="password" id="authPassword" placeholder="Пароль (мінімум 6 символів)" required>
                 <div class="auth-buttons">
-                    <button type="button" id="registerBtn" class="auth-action-btn">Зареєструватися</button>
                     <button type="button" id="signInBtn" class="auth-action-btn primary">Увійти</button>
+                    <button type="button" id="registerBtn" class="auth-action-btn" style="display:none;">Зареєструватися</button>
+                </div>
+                <div class="auth-toggle-link">
+                    Немає акаунта? <a id="switchToRegister">Зареєструйтеся</a>
                 </div>
             </div>
         </div>
@@ -132,7 +143,9 @@
             <input type="text" id="aptAddress" placeholder="Адреса" required>
             <input type="text" id="aptFloor" placeholder="Поверх (напр. 4\7)" required>
             <input type="number" id="aptPrice" placeholder="Ціна (лише цифри, напр. 550)" required>
-            <input type="text" id="aptImage" placeholder="Посилання на фото (https://...)" required>
+            <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;">Фото квартири</label>
+            <img id="aptImagePreview" src="" alt="" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+            <input type="file" id="aptImage" accept="image/*" style="width:100%;margin-bottom:15px;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;cursor:pointer;" onchange="const f=this.files[0];const p=document.getElementById('aptImagePreview');if(f){p.src=URL.createObjectURL(f);p.style.display='block';}else{p.style.display='none';}">
             <div class="auth-buttons">
                 <button type="button" id="saveApartmentBtn" class="auth-action-btn primary">Зберегти квартиру</button>
             </div>
@@ -154,15 +167,14 @@
             </div>
         </div>
         <div class="footer-right">
-            <p></p>
-            <p></p>
+            <p>© 2025 STRIVE — Оренда житла в Івано-Франківську. Всі права захищені.</p>
+            <p>Знаходимо ваш ідеальний дім швидко, зручно та безпечно.</p>
         </div>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
 <script src="script.js"></script>
 </body>
 </html>

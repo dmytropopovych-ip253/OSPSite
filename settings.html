@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STRIVE — Налаштування акаунта</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="site-preloader">
+    <div class="preloader-logo">STRIVE <span>Оренда житла</span></div>
+    <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
+</div>
+
+<nav class="navbar">
+    <div class="container nav-wrapper">
+        <div class="logo">STRIVE <span>Оренда житла</span></div>
+        <div class="nav-links" id="navAuthBlock">
+            <a href="main.html">Головна</a>
+            <a href="search.html">Пошук</a>
+            <a href="#" id="contactsBtn">Контакти</a>
+            <div id="userMenuWrapper" class="user-menu-wrapper">
+                <a href="#" id="loginBtn">Увійти</a>
+                <div id="userDropdown" class="dropdown-panel profile-dropdown">
+                    <div class="sort-option" onclick="window.location.href='profile.html'">Профіль</div>
+                    <div class="sort-option" onclick="window.location.href='settings.html'">Настройки акаунта</div>
+                    <div id="adminPanelLink" class="sort-option" style="display:none;" onclick="window.location.href='admin.html'">Адмін Панель</div>
+                    <hr>
+                    <div class="sort-option logout-opt" id="logoutBtn">Вийти</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container settings-page">
+
+    <div class="settings-page-header">
+        <h1>⚙️ Налаштування акаунта</h1>
+        <a href="profile.html">← Назад до профілю</a>
+    </div>
+
+    <!-- ─── AVATAR & BASIC INFO ─── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <div class="card-header-icon icon-blue">👤</div>
+            <div class="card-header-text">
+                <h2>Інформація профілю</h2>
+                <p>Ваше фото, логін та контактна адреса</p>
+            </div>
+        </div>
+        <div class="settings-card-body">
+
+            <div class="avatar-section">
+                <div class="avatar-wrap">
+                    <div class="avatar-circle" id="avatarCircle" onclick="triggerAvatarUpload()">
+                        <span id="avatarInitial">?</span>
+                        <img id="avatarImg" src="" alt="" style="display:none;">
+                    </div>
+                    <div class="avatar-edit-badge" onclick="triggerAvatarUpload()">✏️</div>
+                    <input type="file" id="avatarFileInput" accept="image/*">
+                </div>
+                <div class="avatar-info">
+                    <h3>Фото профілю</h3>
+                    <p>JPG, PNG або GIF до 5 МБ. Рекомендований розмір: 200×200 px.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="avatar-upload-btn" onclick="triggerAvatarUpload()">📁 Вибрати фото</button>
+                        <button class="avatar-remove-btn" id="removeAvatarBtn" style="display:none;" onclick="removeAvatar()">🗑 Видалити</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fields-row">
+                <div class="settings-field">
+                    <label>👤 Логін</label>
+                    <input type="text" class="settings-input" id="setLogin" placeholder="your_login">
+                    <div class="settings-hint">Використовується для входу в акаунт</div>
+                </div>
+                <div class="settings-field">
+                    <label>📧 Email</label>
+                    <input type="email" class="settings-input" id="setEmail" placeholder="your@email.com">
+                    <div class="settings-hint">Контактна адреса електронної пошти</div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="btn-primary" id="saveAccountBtn">💾 Зберегти зміни</button>
+                <button class="btn-secondary" id="cancelAccountBtn">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── SECURITY ─── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <div class="card-header-icon icon-green">🔒</div>
+            <div class="card-header-text">
+                <h2>Безпека</h2>
+                <p>Змініть пароль вашого акаунта</p>
+            </div>
+        </div>
+        <div class="settings-card-body">
+            <div class="settings-field">
+                <label>🔑 Поточний пароль</label>
+                <div class="password-wrap">
+                    <input type="password" class="settings-input" id="currentPassword" placeholder="Введіть поточний пароль">
+                    <button class="pw-toggle" type="button" onclick="togglePw('currentPassword', this)">👁</button>
+                </div>
+            </div>
+            <div class="fields-row">
+                <div class="settings-field">
+                    <label>🔐 Новий пароль</label>
+                    <div class="password-wrap">
+                        <input type="password" class="settings-input" id="newPassword" placeholder="Мінімум 6 символів" oninput="checkStrength(this.value)">
+                        <button class="pw-toggle" type="button" onclick="togglePw('newPassword', this)">👁</button>
+                    </div>
+                    <div class="pw-strength-bar"><div class="pw-strength-fill" id="strengthFill"></div></div>
+                    <div class="pw-strength-label" id="strengthLabel"></div>
+                </div>
+                <div class="settings-field">
+                    <label>✅ Підтвердити пароль</label>
+                    <div class="password-wrap">
+                        <input type="password" class="settings-input" id="confirmPassword" placeholder="Повторіть новий пароль">
+                        <button class="pw-toggle" type="button" onclick="togglePw('confirmPassword', this)">👁</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="btn-primary" id="savePasswordBtn">🔒 Змінити пароль</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── DANGER ZONE ─── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <div class="card-header-icon icon-red">⚠️</div>
+            <div class="card-header-text">
+                <h2>Небезпечна зона</h2>
+                <p>Незворотні дії з акаунтом</p>
+            </div>
+        </div>
+        <div class="settings-card-body">
+            <div class="danger-card">
+                <div class="danger-icon">🗑️</div>
+                <div class="danger-text">
+                    <h3>Видалити акаунт</h3>
+                    <p>Після видалення акаунта всі ваші дані будуть безповоротно втрачені. Цю дію неможливо скасувати. Будь ласка, впевніться, що хочете продовжити.</p>
+                    <button class="btn-danger" id="deleteAccountBtn">🗑️ Видалити мій акаунт</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div class="footer-left">
+            <h3>Гаряча лінія</h3>
+            <a href="tel:+380673224252" class="phone">+380 (67) 322 42 52</a>
+        </div>
+        <div class="footer-right">
+            <p>© 2025 STRIVE — Оренда житла в Івано-Франківську. Всі права захищені.</p>
+        </div>
+    </div>
+</footer>
+
+<div class="modal-overlay" id="contactOverlay">
+    <div class="auth-modal">
+        <button class="close-btn" id="closeContact">&#10006;</button>
+        <h2>Зв'язатися з нами</h2>
+        <div class="auth-form">
+            <input type="text" id="contactName" placeholder="Ваше ім'я" required>
+            <input type="email" id="contactEmail" placeholder="Ваша пошта" required>
+            <textarea id="contactMessage" placeholder="Ваше повідомлення..." rows="4" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;font-family:inherit;resize:vertical;margin-bottom:15px;outline:none;"></textarea>
+            <button type="button" id="sendContactBtn" class="auth-action-btn primary">Відправити</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

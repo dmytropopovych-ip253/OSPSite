@@ -1,0 +1,166 @@
+/* ── Fonts ── */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+
+/* ── Reset ── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+
+/* ── Design Tokens ── */
+
+:root {
+    /* Brand palette */
+    --brand:       #2c7a9b;
+    --brand-dark:  #1d5f7a;
+    --brand-light: #e8f4f8;
+    --brand-pale:  #f0f8fb;
+
+    /* Accent colours */
+    --accent:      #4ecba4;
+    --accent-warm: #f4845f;
+
+    /* Typography colours */
+    --text-main:   #1a2332;
+    --text-muted:  #7a8a99;
+    --text-light:  #b0bec8;
+
+    /* Surfaces & borders */
+    --surface:     #ffffff;
+    --surface-2:   #f7fafc;
+    --border:      #e4edf2;
+
+    /* Shadows */
+    --shadow-sm:   0 2px 8px  rgba(44, 122, 155, 0.08);
+    --shadow-md:   0 8px 24px rgba(44, 122, 155, 0.12);
+    --shadow-lg:   0 20px 60px rgba(44, 122, 155, 0.16);
+
+    /* Border radii */
+    --radius-sm:   8px;
+    --radius-md:   14px;
+    --radius-lg:   22px;
+    --radius-xl:   32px;
+
+    /* Font families */
+    --ff-display:  'Playfair Display', Georgia, serif;
+    --ff-body:     'DM Sans', sans-serif;
+}
+
+
+/* ── Base Styles ── */
+
+body {
+    margin: 0;
+    font-family: var(--ff-body);
+    background: #fafcfd;
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 6px 0;
+}
+
+
+/* ── Layout ── */
+
+.container {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+
+/* ── Animations ── */
+
+@keyframes card-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+.card-fadein {
+    opacity: 0;
+    animation: card-fade-up 0.35s ease forwards;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* ── Page Loader ── */
+
+.page-loader {
+    width: 44px;
+    height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.85s linear infinite;
+}
+
+
+/* ── Site Preloader ── */
+
+#site-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#site-preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Preloader logo */
+.preloader-logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--brand);
+}
+
+.preloader-logo span {
+    color: #888;
+    font-weight: 400;
+    font-size: 14px;
+    display: block;
+    text-align: center;
+    margin-top: 4px;
+    letter-spacing: 0;
+}
+
+/* Progress bar */
+.preloader-bar-wrap {
+    width: 160px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.preloader-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--brand);
+    border-radius: 99px;
+    animation: preloader-fill 1s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+@keyframes preloader-fill {
+    0%   { width: 0%;   }
+    60%  { width: 75%;  }
+    100% { width: 100%; }
+}

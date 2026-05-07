@@ -5,292 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STRIVE — Оренда житла</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .hero {
-            background: linear-gradient(135deg, #3d7f99 0%, #2a5f75 60%, #1e4a5c 100%);
-            color: white;
-            padding: 100px 0 120px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        .hero-content { position: relative; z-index: 1; }
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50px;
-            padding: 6px 20px;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 24px;
-        }
-        .hero h1 {
-            font-size: clamp(38px, 6vw, 72px);
-            font-weight: 800;
-            margin: 0 0 20px;
-            line-height: 1.1;
-        }
-        .hero h1 span { color: #7ddcb5; }
-        .hero p {
-            font-size: 18px;
-            opacity: 0.85;
-            max-width: 520px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-        .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .btn-hero-primary {
-            background: white;
-            color: var(--brand-color);
-            font-weight: 700;
-            font-size: 16px;
-            padding: 16px 40px;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-        .btn-hero-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
-        }
-        .btn-hero-outline {
-            background: transparent;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            padding: 16px 40px;
-            border-radius: 50px;
-            border: 2px solid rgba(255,255,255,0.6);
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.25s ease;
-        }
-        .btn-hero-outline:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: white;
-        }
-
-        /* ── Stats strip ───────────────────────── */
-        .stats-strip {
-            background: white;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            border-radius: 16px;
-            margin: -50px auto 0;
-            max-width: 900px;
-            display: flex;
-            position: relative;
-            z-index: 10;
-        }
-        .stat-item {
-            flex: 1;
-            padding: 30px 20px;
-            text-align: center;
-            border-right: 1px solid #f0f0f0;
-        }
-        .stat-item:last-child { border-right: none; }
-        .stat-num {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--brand-color);
-            display: block;
-        }
-        .stat-label {
-            font-size: 13px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-            display: block;
-        }
-
-        /* ── Section ────────────────────────────── */
-        .section { padding: 90px 0; }
-        .section-tag {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--brand-color);
-            font-weight: 700;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .section-title {
-            font-size: clamp(26px, 3.5vw, 42px);
-            font-weight: 800;
-            color: #1a1a2e;
-            margin: 0 0 16px;
-            line-height: 1.2;
-        }
-        .section-sub {
-            font-size: 17px;
-            color: #666;
-            max-width: 520px;
-            line-height: 1.6;
-            margin: 0 0 50px;
-        }
-
-        /* ── Feature cards ──────────────────────── */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 28px;
-        }
-        .feature-card {
-            background: #f8fbfc;
-            border-radius: 20px;
-            padding: 36px 30px;
-            border: 1px solid #e8f3f7;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .feature-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--brand-color), #46bb8a);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        .feature-card:hover { box-shadow: 0 12px 40px rgba(61,127,153,0.12); transform: translateY(-5px); }
-        .feature-card:hover::after { transform: scaleX(1); }
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--brand-color), #2a5f75);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            margin-bottom: 20px;
-        }
-        .feature-card h3 {
-            font-size: 19px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin: 0 0 10px;
-        }
-        .feature-card p { color: #666; font-size: 14px; line-height: 1.6; margin: 0; }
-
-        /* ── How it works ───────────────────────── */
-        .how-section { background: #f0f7fa; }
-        .steps-wrap { display: flex; gap: 0; position: relative; flex-wrap: wrap; }
-        .steps-wrap::before {
-            content: '';
-            position: absolute;
-            top: 35px; left: 35px; right: 35px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--brand-color), #46bb8a);
-        }
-        .step {
-            flex: 1;
-            min-width: 160px;
-            text-align: center;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-        }
-        .step-num {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--brand-color), #2a5f75);
-            color: white;
-            font-size: 24px;
-            font-weight: 800;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 6px 20px rgba(61,127,153,0.35);
-        }
-        .step h4 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0 0 8px; }
-        .step p { font-size: 13px; color: #666; margin: 0; line-height: 1.5; }
-
-        /* ── CTA banner ─────────────────────────── */
-        .cta-banner {
-            background: linear-gradient(135deg, #1a1a2e 0%, #2a5f75 100%);
-            border-radius: 24px;
-            padding: 70px 60px;
-            text-align: center;
-            color: white;
-            margin: 0 0 90px;
-            position: relative;
-            overflow: hidden;
-        }
-        .cta-banner::before {
-            content: '🏠';
-            position: absolute;
-            font-size: 200px;
-            opacity: 0.05;
-            top: -30px;
-            right: -20px;
-            line-height: 1;
-        }
-        .cta-banner h2 { font-size: 36px; font-weight: 800; margin: 0 0 16px; }
-        .cta-banner p { font-size: 17px; opacity: 0.8; margin: 0 0 36px; }
-
-        /* ── Testimonials ───────────────────────── */
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-        .review-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            border: 1px solid #f0f0f0;
-        }
-        .stars { color: #ffc107; font-size: 18px; margin-bottom: 14px; }
-        .review-text { color: #555; font-size: 14px; line-height: 1.7; margin: 0 0 20px; font-style: italic; }
-        .reviewer { display: flex; align-items: center; gap: 12px; }
-        .reviewer-avatar {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--brand-color), #46bb8a);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 16px;
-        }
-        .reviewer-name { font-weight: 700; font-size: 14px; color: #333; }
-        .reviewer-loc { font-size: 12px; color: #888; }
-
-        /* ── Responsive ─────────────────────────── */
-        @media (max-width: 700px) {
-            .stats-strip { flex-direction: column; }
-            .stat-item { border-right: none; border-bottom: 1px solid #f0f0f0; }
-            .stat-item:last-child { border-bottom: none; }
-            .steps-wrap::before { display: none; }
-            .cta-banner { padding: 50px 30px; }
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
+
+<div id="site-preloader">
+    <div class="preloader-logo">STRIVE <span>Оренда житла</span></div>
+    <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
+</div>
 
 <nav class="navbar">
     <div class="container nav-wrapper">
         <div class="logo">STRIVE <span>Оренда житла</span></div>
-        <div class="nav-links">
+        <div class="nav-links" id="navAuthBlock">
+            <a href="#how">Як це працює</a>
             <a href="main.html">Головна</a>
             <a href="search.html">Пошук</a>
-            <a href="#how">Як це працює</a>
-            <a href="#contacts">Контакти</a>
+            <a href="#" id="contactsBtn">Контакти</a>
+            <div id="userMenuWrapper" class="user-menu-wrapper">
+                <a href="#" id="loginBtn">Увійти</a>
+                <div id="userDropdown" class="dropdown-panel profile-dropdown">
+                    <div class="sort-option" onclick="window.location.href='profile.html'">Профіль</div>
+                    <div class="sort-option" onclick="window.location.href='settings.html'">Настройки акаунта</div>
+                    <div id="adminPanelLink" class="sort-option" style="display: none;" onclick="window.location.href='admin.html'">Адмін Панель</div>
+                    <hr>
+                    <div class="sort-option logout-opt" id="logoutBtn">Вийти</div>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
@@ -300,9 +41,9 @@
     <div class="container hero-content">
         <div class="hero-badge">✨ Найкращий сервіс оренди</div>
         <h1>Знайди своє<br><span>ідеальне житло</span></h1>
-        <p>Тисячі перевірених квартир у вашому місті. Зручний пошук, прозорі умови, швидке оформлення.</p>
+        <p>Перевірені квартири в Івано-Франківську. Зручний пошук, прозорі умови, швидке оформлення.</p>
         <div class="hero-btns">
-            <a href="search.html" class="btn-hero-primary">🔍 Переглянути квартири</a>
+            <a href="search.html" class="btn-hero-primary">🔍 Шукати квартири</a>
             <a href="#how" class="btn-hero-outline">Як це працює</a>
         </div>
     </div>
@@ -312,16 +53,12 @@
 <div class="container">
     <div class="stats-strip">
         <div class="stat-item">
-            <span class="stat-num">1 200+</span>
+            <span class="stat-num">300+</span>
             <span class="stat-label">Квартир</span>
         </div>
         <div class="stat-item">
-            <span class="stat-num">850+</span>
+            <span class="stat-num">500+</span>
             <span class="stat-label">Задоволених орендарів</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num">15+</span>
-            <span class="stat-label">Міст</span>
         </div>
         <div class="stat-item">
             <span class="stat-num">4.9 ★</span>
@@ -406,7 +143,7 @@
                     <div class="reviewer-avatar">О</div>
                     <div>
                         <div class="reviewer-name">Оксана Мельник</div>
-                        <div class="reviewer-loc">Київ</div>
+                        <div class="reviewer-loc">Івано-Франківськ</div>
                     </div>
                 </div>
             </div>
@@ -417,7 +154,7 @@
                     <div class="reviewer-avatar">А</div>
                     <div>
                         <div class="reviewer-name">Андрій Коваль</div>
-                        <div class="reviewer-loc">Львів</div>
+                        <div class="reviewer-loc">Івано-Франківськ</div>
                     </div>
                 </div>
             </div>
@@ -428,7 +165,7 @@
                     <div class="reviewer-avatar">В</div>
                     <div>
                         <div class="reviewer-name">Василь Іваненко</div>
-                        <div class="reviewer-loc">Харків</div>
+                        <div class="reviewer-loc">Івано-Франківськ</div>
                     </div>
                 </div>
             </div>
@@ -440,8 +177,8 @@
 <div class="container" id="contacts">
     <div class="cta-banner">
         <h2>Готові знайти свій новий дім?</h2>
-        <p>Тисячі квартир чекають саме на вас. Починайте пошук прямо зараз — це безкоштовно!</p>
-        <a href="search.html" class="btn-hero-primary">Переглянути квартири →</a>
+        <p>Найкращі квартири Івано-Франківська чекають на вас. Починайте пошук прямо зараз — це безкоштовно!</p>
+        <a href="search.html" class="btn-hero-primary">Шукати квартири →</a>
     </div>
 </div>
 
@@ -457,11 +194,48 @@
             </div>
         </div>
         <div class="footer-right">
-            <p>© 2025 STRIVE — Платформа оренди житла. Всі права захищені.</p>
+            <p>© 2025 STRIVE — Оренда житла в Івано-Франківську. Всі права захищені.</p>
             <p>Знаходимо ваш ідеальний дім швидко, зручно та безпечно.</p>
         </div>
     </div>
 </footer>
 
+<div class="modal-overlay" id="authOverlay">
+    <div class="auth-modal" id="authModal">
+        <button class="close-btn" id="closeAuth">&#10006;</button>
+        <h2>Авторизація</h2>
+        <p class="modal-subtitle">Раді бачити вас знову!</p>
+        <div class="auth-form">
+            <div class="register-only">
+                <input type="email" id="authEmail" placeholder="Пошта (напр. test@email.com)">
+            </div>
+            <input type="text" id="authLogin" placeholder="Логін" required>
+            <input type="password" id="authPassword" placeholder="Пароль (мінімум 6 символів)" required>
+            <div class="auth-buttons">
+                <button type="button" id="signInBtn" class="auth-action-btn primary">Увійти</button>
+                <button type="button" id="registerBtn" class="auth-action-btn" style="display:none;">Зареєструватися</button>
+            </div>
+            <div class="auth-toggle-link">
+                Немає акаунта? <a id="switchToRegister">Зареєструйтеся</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="contactOverlay">
+    <div class="auth-modal" id="contactModal">
+        <button class="close-btn" id="closeContact">&#10006;</button>
+        <h2>Зв'язатися з нами</h2>
+        <div class="auth-form">
+            <input type="text" id="contactName" placeholder="Ваше ім'я" required>
+            <input type="email" id="contactEmail" placeholder="Ваша пошта (напр. test@email.com)" required>
+            <textarea id="contactMessage" placeholder="Ваше повідомлення..." rows="4" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical; margin-bottom: 15px; outline: none;"></textarea>
+            <button type="button" id="sendContactBtn" class="auth-action-btn primary">Відправити</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

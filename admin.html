@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Адмін Панель - STRIVE</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -28,25 +28,6 @@
                     <th>Логін</th>
                     <th>Email</th>
                     <th>Роль</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <div class="admin-header">
-        <h2>Квартири</h2>
-        <button class="add-btn" onclick="openAptModal()">+ Додати квартиру</button>
-    </div>
-    <div style="overflow-x: auto;">
-        <table class="admin-table" id="aptsTable">
-            <thead>
-                <tr>
-                    <th>Фото</th>
-                    <th>Назва</th>
-                    <th>Ціна</th>
-                    <th>Адреса</th>
                     <th>Дії</th>
                 </tr>
             </thead>
@@ -79,16 +60,71 @@
         <table class="admin-table" id="rentalMessagesTable">
             <thead>
                 <tr>
-                    <th>Дата</th>
+                    <th>Дата запиту</th>
                     <th>Юзер</th>
                     <th>Email</th>
                     <th>Квартира</th>
+                    <th>Термін оренди</th>
                     <th>Повідомлення</th>
                     <th>Дії</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
+    </div>
+
+    <!-- ── Apartments (collapsed, at bottom) ── -->
+    <div class="admin-header apt-section-header" id="aptSectionHeader" onclick="toggleAptSection()" style="cursor:pointer; user-select:none;">
+        <h2>Квартири <span id="aptTotalBadge" class="apt-total-badge"></span></h2>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="add-btn" onclick="event.stopPropagation(); openAptModal()">+ Додати квартиру</button>
+            <span class="apt-collapse-icon" id="aptCollapseIcon">▼</span>
+        </div>
+    </div>
+
+    <div id="aptSectionBody" class="apt-section-body">
+        <div class="apt-filter-bar">
+            <div class="apt-filter-search-wrap">
+                <svg class="apt-search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="aptSearchInput" class="apt-filter-search" placeholder="Пошук за назвою або адресою...">
+            </div>
+            <div class="apt-filter-rooms">
+                <span class="apt-filter-label">Кімнати:</span>
+                <button class="apt-room-btn" data-room="1">1</button>
+                <button class="apt-room-btn" data-room="2">2</button>
+                <button class="apt-room-btn" data-room="3">3</button>
+                <button class="apt-room-btn" data-room="4">4+</button>
+            </div>
+            <div class="apt-filter-price">
+                <input type="number" id="aptPriceFrom" class="apt-price-input" placeholder="Від $">
+                <span class="apt-price-sep">—</span>
+                <input type="number" id="aptPriceTo" class="apt-price-input" placeholder="До $">
+            </div>
+            <button class="apt-filter-reset" id="aptFilterReset" onclick="resetAptFilters()">✕ Скинути</button>
+        </div>
+        <div id="aptFilterCount" class="apt-filter-count" style="display:none;"></div>
+
+        <div style="overflow-x: auto;">
+            <table class="admin-table" id="aptsTable">
+                <thead>
+                    <tr>
+                        <th>Фото</th>
+                        <th>Назва</th>
+                        <th>Ціна</th>
+                        <th>Адреса</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="aptShowMoreWrap" class="apt-show-more-wrap" style="display:none;">
+            <button class="apt-show-more-btn" id="aptShowMoreBtn" onclick="toggleAptRows()">
+                <span id="aptShowMoreLabel">Показати всі</span>
+                <svg id="aptShowMoreArrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -110,14 +146,44 @@
 </div>
 
 <div class="modal-overlay" id="aptModal">
-    <div class="auth-modal">
+    <div class="auth-modal" style="max-width:520px;">
         <button class="close-btn" onclick="closeModal('aptModal')">&#10006;</button>
         <h2 id="aptModalTitle">Квартира</h2>
         <div class="auth-form">
             <input type="hidden" id="aptId">
-            <input type="text" id="aptTitle" placeholder="Заголовок">
+            <input type="text" id="aptTitle" placeholder="Назва (напр. Світла квартира в центрі)">
             <input type="text" id="aptAddress" placeholder="Адреса">
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <input type="text" id="aptRoomsAdmin" placeholder="Кімнати (напр. 2 кімнати)">
+                <input type="text" id="aptFloorAdmin" placeholder="Поверх (напр. 4\7)">
+            </div>
+
             <input type="number" id="aptPrice" placeholder="Ціна ($)">
+
+            <textarea id="aptDescAdmin" placeholder="Опис квартири..." style="width:100%;min-height:90px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:var(--ff-body);color:var(--text-main);background:var(--surface-2);outline:none;resize:vertical;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+
+            <label class="always-avail-label">
+                <input type="checkbox" id="aptAlwaysAvailAdmin" onchange="
+                    const dr = document.getElementById('aptDateRowAdmin');
+                    if (this.checked) { dr.style.opacity='0.4'; dr.style.pointerEvents='none';
+                        document.getElementById('aptAvailFromAdmin').value='';
+                        document.getElementById('aptAvailToAdmin').value=''; }
+                    else { dr.style.opacity='1'; dr.style.pointerEvents='auto'; }">
+                <span class="always-avail-check"></span>
+                Завжди доступна
+            </label>
+            <div id="aptDateRowAdmin" class="apt-date-row">
+                <div class="apt-date-field">
+                    <label>Доступна від</label>
+                    <input type="date" id="aptAvailFromAdmin">
+                </div>
+                <div class="apt-date-field">
+                    <label>Доступна до</label>
+                    <input type="date" id="aptAvailToAdmin">
+                </div>
+            </div>
+
             <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;">Фото квартири</label>
             <img id="adminAptImagePreview" src="" alt="" style="display:none;width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
             <input type="file" id="aptImage" accept="image/*" style="width:100%;margin-bottom:15px;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;cursor:pointer;" onchange="const f=this.files[0];const p=document.getElementById('adminAptImagePreview');if(f){p.src=URL.createObjectURL(f);p.style.display='block';}else{p.style.display='none';}">
@@ -127,8 +193,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
-<script src="admin.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

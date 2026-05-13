@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STRIVE — Пошук квартир</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
 <div id="site-preloader">
     <div class="preloader-logo">STRIVE <span>Оренда житла</span></div>
     <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
@@ -143,6 +142,32 @@
             <input type="text" id="aptAddress" placeholder="Адреса" required>
             <input type="text" id="aptFloor" placeholder="Поверх (напр. 4\7)" required>
             <input type="number" id="aptPrice" placeholder="Ціна (лише цифри, напр. 550)" required>
+            <label class="always-avail-label">
+                <input type="checkbox" id="aptAlwaysAvail" onchange="
+                    const dateRow = document.getElementById('aptDateRow');
+                    if (this.checked) {
+                        dateRow.style.opacity = '0.4';
+                        dateRow.style.pointerEvents = 'none';
+                        document.getElementById('aptAvailFrom').value = '';
+                        document.getElementById('aptAvailTo').value = '';
+                    } else {
+                        dateRow.style.opacity = '1';
+                        dateRow.style.pointerEvents = 'auto';
+                    }
+                ">
+                <span class="always-avail-check"></span>
+                Завжди доступна
+            </label>
+            <div id="aptDateRow" class="apt-date-row">
+                <div class="apt-date-field">
+                    <label>Доступна від</label>
+                    <input type="date" id="aptAvailFrom">
+                </div>
+                <div class="apt-date-field">
+                    <label>Доступна до</label>
+                    <input type="date" id="aptAvailTo">
+                </div>
+            </div>
             <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;">Фото квартири</label>
             <img id="aptImagePreview" src="" alt="" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
             <input type="file" id="aptImage" accept="image/*" style="width:100%;margin-bottom:15px;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;cursor:pointer;" onchange="const f=this.files[0];const p=document.getElementById('aptImagePreview');if(f){p.src=URL.createObjectURL(f);p.style.display='block';}else{p.style.display='none';}">
@@ -174,7 +199,10 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="script.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

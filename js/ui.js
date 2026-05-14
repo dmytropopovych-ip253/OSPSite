@@ -1,17 +1,20 @@
+import { isRegisterMode, setIsRegisterMode, currentPage, setCurrentPage, currentFilteredData, itemsPerPage } from './state.js';
+import { buildAvailabilityHTML, formatDate } from './utils.js';
+
 /* ============================================================
    UI.JS — Функції для побудови HTML і рендеру у DOM
    ============================================================ */
 
 /* ── Apartment Cards (Search Page) ── */
 
-function renderCurrentPage() {
+export function renderCurrentPage() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const pageData   = currentFilteredData.slice(startIndex, startIndex + itemsPerPage);
     renderCards(pageData);
     renderPagination(currentFilteredData.length);
 }
 
-function renderCards(data) {
+export function renderCards(data) {
     const container = document.getElementById('apartments');
     if (!container) return;
     container.innerHTML = '';
@@ -53,7 +56,7 @@ function renderCards(data) {
     });
 }
 
-function renderPagination(totalItems) {
+export function renderPagination(totalItems) {
     const paginationContainer = document.getElementById('pagination');
     if (!paginationContainer) return;
     paginationContainer.innerHTML = '';
@@ -66,7 +69,7 @@ function renderPagination(totalItems) {
         btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
         btn.innerText = i;
         btn.onclick = () => {
-            currentPage = i;
+            setCurrentPage(i);
             const section = document.getElementById('apartments');
             if (section) window.scrollTo({ top: section.offsetTop - 100, behavior: 'smooth' });
             showPageLoading();
@@ -76,7 +79,7 @@ function renderPagination(totalItems) {
     }
 }
 
-function showPageLoading() {
+export function showPageLoading() {
     const container = document.getElementById('apartments');
     if (!container) return;
     container.innerHTML = `
@@ -93,7 +96,7 @@ window.goToApartment = function (id) {
 
 /* ── Auth UI ── */
 
-function updateAuthUI() {
+export function updateAuthUI() {
     const currentUser    = JSON.parse(sessionStorage.getItem('currentUser'));
     const loginBtn       = document.getElementById('loginBtn');
     const adminControls  = document.getElementById('adminControls');
@@ -111,8 +114,8 @@ function updateAuthUI() {
     }
 }
 
-function setAuthMode(register) {
-    isRegisterMode = register;
+export function setAuthMode(register) {
+    setIsRegisterMode(register);
     const modal     = document.getElementById('authModal');
     const signInBtn = document.getElementById('signInBtn');
     const registerBtn = document.getElementById('registerBtn');
@@ -151,7 +154,7 @@ function setAuthMode(register) {
     }
 }
 
-function showToast(msg, type = 'success') {
+export function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     if (!t) return;
     t.textContent = msg;
@@ -163,7 +166,7 @@ function showToast(msg, type = 'success') {
 
 /* ── Apartment Detail Card (apartment.js) ── */
 
-function renderAptCard(apt, isEditMode) {
+export function renderAptCard(apt, isEditMode) {
     const container = document.getElementById('mainAptContent');
     if (!container) return;
 
@@ -245,7 +248,7 @@ function renderAptCard(apt, isEditMode) {
     }
 }
 
-function renderRecommendationCards(recommendations) {
+export function renderRecommendationCards(recommendations) {
     const recGrid = document.getElementById('recommendGrid');
     if (!recGrid) return;
     recGrid.innerHTML = recommendations.map(item => {
@@ -273,7 +276,7 @@ function renderRecommendationCards(recommendations) {
 
 /* ── Admin Tables (admin.js) ── */
 
-function renderUsersTable(accounts) {
+export function renderUsersTable(accounts) {
     const uBody = document.querySelector('#usersTable tbody');
     if (!uBody) return;
     uBody.innerHTML = accounts.map(acc => `
@@ -289,7 +292,7 @@ function renderUsersTable(accounts) {
     `).join('') || '<tr><td colspan="4" class="empty-row">Немає користувачів</td></tr>';
 }
 
-function renderContactMessagesTable(messages) {
+export function renderContactMessagesTable(messages) {
     const mBody = document.querySelector('#messagesTable tbody');
     if (!mBody) return;
     mBody.innerHTML = messages.map(m => `
@@ -303,7 +306,7 @@ function renderContactMessagesTable(messages) {
     `).join('') || '<tr><td colspan="5" class="empty-row">Повідомлень немає</td></tr>';
 }
 
-function renderRentalMessagesTable(rentalMessages, aptsMap) {
+export function renderRentalMessagesTable(rentalMessages, aptsMap) {
     const rmBody = document.querySelector('#rentalMessagesTable tbody');
     if (!rmBody) return;
     rmBody.innerHTML = rentalMessages.map(m => {
@@ -328,7 +331,7 @@ function renderRentalMessagesTable(rentalMessages, aptsMap) {
     }).join('') || '<tr><td colspan="7" class="empty-row">Повідомлень немає</td></tr>';
 }
 
-function renderAdminAptsTable(apartments, aptsFiltered) {
+export function renderAdminAptsTable(apartments, aptsFiltered) {
     const badge = document.getElementById('aptTotalBadge');
     if (badge) badge.textContent = apartments.length > 0 ? apartments.length : '';
 
@@ -351,7 +354,7 @@ function renderAdminAptsTable(apartments, aptsFiltered) {
 
 /* ── Profile Messages (profile.js) ── */
 
-function renderProfileMessages(list, aptsMap) {
+export function renderProfileMessages(list, aptsMap) {
     const msgContainer = document.getElementById('messagesList');
     if (!msgContainer) return;
 
@@ -386,19 +389,19 @@ function renderProfileMessages(list, aptsMap) {
 
 let avatarDataURL = null;
 
-function applyAvatar(src) {
+export function applyAvatar(url) {
     const img = document.getElementById('avatarImg');
     const ini = document.getElementById('avatarInitial');
     if (!img || !ini) return;
-    img.src = src;
+    img.src = url;
     img.style.display = 'block';
     ini.style.display = 'none';
     const removeBtn = document.getElementById('removeAvatarBtn');
     if (removeBtn) removeBtn.style.display = 'inline-flex';
-    avatarDataURL = src;
+    avatarDataURL = url;
 }
 
-function removeAvatarUI() {
+export function removeAvatarUI() {
     const img = document.getElementById('avatarImg');
     const ini = document.getElementById('avatarInitial');
     if (img) { img.src = ''; img.style.display = 'none'; }
@@ -408,7 +411,7 @@ function removeAvatarUI() {
     avatarDataURL = null;
 }
 
-function triggerAvatarUpload() {
+export function triggerAvatarUpload() {
     const input = document.getElementById('avatarFileInput');
     if (input) input.click();
 }
@@ -416,7 +419,7 @@ function triggerAvatarUpload() {
 
 /* ── Settings — Password Strength ── */
 
-function checkStrength(val) {
+export function checkStrength(val) {
     const fill  = document.getElementById('strengthFill');
     const label = document.getElementById('strengthLabel');
     if (!fill || !label) return;
@@ -442,7 +445,7 @@ function checkStrength(val) {
     label.style.color     = lv.bg;
 }
 
-function togglePw(inputId, btn) {
+export function togglePw(inputId, btn) {
     const inp    = document.getElementById(inputId);
     if (!inp) return;
     const hidden = inp.type === 'password';

@@ -1,16 +1,33 @@
-/* ============================================================
-   APP.JS — Головний файл. З'єднує api.js, ui.js, state.js, utils.js
-   ============================================================
-   Порядок підключення у HTML:
-     <script src="supabase.js"></script>
-     <script src="js/utils.js"></script>
-     <script src="js/state.js"></script>
-     <script src="js/api.js"></script>
-     <script src="js/ui.js"></script>
-     <script src="js/app.js"></script>
-   ============================================================ */
+import {
+  apiFetchApartments, apiFetchApartmentById,
+  apiInsertApartment, apiUpdateApartment, apiDeleteApartment, apiUploadApartmentImage,
+  apiFetchAccounts, apiInsertAccount, apiFetchAccountByLogin,
+  apiInsertRentalMessage,
+  apiFetchContactMessages, apiInsertContactMessage, apiDeleteContactMessage,
+  apiFetchRentalMessages, apiDeleteRentalMessage,
+  apiUpdateAccount, apiDeleteAccount, apiUploadAvatar,
+} from './api.js';
 
+import { isValidEmail, formatDate, buildAvailabilityHTML } from './utils.js';
 
+import {
+  allData, setAllData,
+  currentFilteredData, setCurrentFilteredData,
+  currentPage, setCurrentPage,
+  currentSort, setCurrentSort,
+  isRegisterMode, setIsRegisterMode,
+  itemsPerPage,
+} from './state.js';
+
+import {
+  renderCurrentPage, renderCards, renderPagination,
+  updateAuthUI, setAuthMode, showToast,
+  renderAptCard, renderRecommendationCards,
+  renderUsersTable, renderContactMessagesTable,
+  renderRentalMessagesTable, renderAdminAptsTable,
+  renderProfileMessages, checkStrength, togglePw,
+  applyAvatar, removeAvatarUI, triggerAvatarUpload,
+} from './ui.js';
 /* ════════════════════════════════════════════════════════════
    SEARCH PAGE  (search.html / index.html)
    ════════════════════════════════════════════════════════════ */
@@ -42,13 +59,13 @@ function applyFiltersAndSort() {
     if (currentSort === 'cheap')     result.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
     if (currentSort === 'expensive') result.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
 
-    currentFilteredData = result;
-    currentPage = 1;
+    setCurrentFilteredData(result);
+    setCurrentPage(1);
     renderCurrentPage();
 }
 
 async function loadApartments() {
-    allData = await apiFetchApartments();
+    setAllData(await apiFetchApartments());
     applyFiltersAndSort();
 }
 
@@ -879,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.sort-dropdown .sort-option').forEach(option => {
             option.onclick = () => {
-                currentSort = option.dataset.sort;
+                setCurrentSort(option.dataset.sort);
                 const el = document.getElementById('currentSort');
                 if (el) el.innerText = option.innerText;
                 applyFiltersAndSort();

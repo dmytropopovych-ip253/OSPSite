@@ -1,20 +1,15 @@
 /* ============================================================
-   js/profile-page.js — Сторінка профілю (profile.html)
-   ============================================================
-   Відповідає за:
-     - відображення даних поточного користувача
-     - завантаження та відображення аватара
-     - список орендних повідомлень
-   Залежності:
-     - api.js → apiFetchAccountByLogin, apiFetchRentalMessages, apiFetchApartments
-     - ui.js  → renderProfileMessages
+   js/profile-page.js — Сторінка профілю (Supabase Auth)
    ============================================================ */
 
-import { apiFetchAccountByLogin, apiFetchRentalMessages, apiFetchApartments } from '../services/api.js';
-import { renderProfileMessages } from '../ui/index.js';
+import { apiFetchRentalMessages, apiFetchApartments } from '../services/api.js';
+import { renderProfileMessages }                      from '../ui/ui.js';
+import { supabaseClient }                             from '../supabase-client.js';
+import { syncCurrentUser }                            from './auth.js';
 
 export async function initProfilePage() {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    // Синхронізуємо сесію Supabase Auth → sessionStorage
+    const currentUser = await syncCurrentUser();
     if (!currentUser) { window.location.href = 'main.html'; return; }
 
     document.getElementById('profileUsername').textContent = currentUser.login;
@@ -22,17 +17,14 @@ export async function initProfilePage() {
     document.getElementById('profileAvatarInitial').textContent = (currentUser.login || '?')[0].toUpperCase();
 
     /* ── Аватар ── */
-
-    const accData = await apiFetchAccountByLogin(currentUser.login);
-    if (accData?.avatar_url) {
+    if (currentUser.avatar_url) {
         const img = document.getElementById('profileAvatarImg');
-        if (img) { img.src = accData.avatar_url; img.style.display = 'block'; }
+        if (img) { img.src = currentUser.avatar_url; img.style.display = 'block'; }
         const ini = document.getElementById('profileAvatarInitial');
         if (ini) ini.style.display = 'none';
     }
 
     /* ── Бейдж ролі ── */
-
     const badgeWrap = document.getElementById('profileBadgeWrap');
     const statRole  = document.getElementById('statRole');
     if (currentUser.is_admin) {
@@ -44,7 +36,6 @@ export async function initProfilePage() {
     }
 
     /* ── Орендні повідомлення ── */
-
     const list = await apiFetchRentalMessages(currentUser.login);
     const statMsgCount = document.getElementById('statMsgCount');
     const msgBadge     = document.getElementById('msgBadge');
@@ -60,14 +51,13 @@ export async function initProfilePage() {
     renderProfileMessages(list, aptsMap);
 
     /* ── Логаут ── */
-
-    document.getElementById('profileLogoutBtn').onclick = () => {
+    document.getElementById('profileLogoutBtn').onclick = async () => {
+        await supabaseClient.auth.signOut();
         sessionStorage.removeItem('currentUser');
         window.location.href = 'main.html';
     };
 
     /* ── Navbar ── */
-
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) loginBtn.textContent = currentUser.login;
     const adminPanelLink = document.getElementById('adminPanelLink');
@@ -78,13 +68,12 @@ export async function initProfilePage() {
     }
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.onclick = () => {
+        logoutBtn.onclick = async () => {
+            await supabaseClient.auth.signOut();
             sessionStorage.removeItem('currentUser');
             window.location.href = 'main.html';
         };
     }
-
-    /* ── Preloader ── */
 
     const preloader = document.getElementById('site-preloader');
     if (preloader) setTimeout(() => preloader.classList.add('hidden'), 900);

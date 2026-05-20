@@ -21,7 +21,7 @@ import {
     apiUploadApartmentImage, apiInsertRentalMessage,
 } from '../services/api.js';
 import { isValidEmail, formatDate }              from '../utils.js';
-import { renderAptCard, renderRecommendationCards } from '../ui/index.js';
+import { renderAptCard, renderRecommendationCards } from '../ui/ui.js';
 import { getCurrentUser }                        from './auth.js';
 
 let currentApt = null;
@@ -89,7 +89,18 @@ window.deleteApartment = async function () {
 
 /* ── Landlord modal (запит оренди) ── */
 
-window.openLandlordModal  = function () { document.getElementById('landlordModal')?.classList.add('active');    };
+window.openLandlordModal  = function () {
+    const user = getCurrentUser();
+    const emailInput = document.getElementById('landlordEmail');
+    const nameInput  = document.getElementById('landlordName');
+    if (user) {
+        if (emailInput) { emailInput.value = user.email || ''; emailInput.style.display = 'none'; }
+        if (nameInput && !nameInput.value) nameInput.value = user.login || '';
+    } else {
+        if (emailInput) emailInput.style.display = '';
+    }
+    document.getElementById('landlordModal')?.classList.add('active');
+};
 window.closeLandlordModal = function () { document.getElementById('landlordModal')?.classList.remove('active'); };
 window.viewNewApt         = function (id) { window.location.href = 'apartment.html?id=' + id; };
 

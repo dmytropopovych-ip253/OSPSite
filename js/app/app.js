@@ -28,7 +28,7 @@ import {
 
 import {
     renderCurrentPage, updateAuthUI, setAuthMode, showPageLoading,
-} from '../ui/index.js';
+} from '../ui/ui.js';
 
 import { initAuth }            from './auth.js';
 import { initContactsModal }   from './contacts.js';

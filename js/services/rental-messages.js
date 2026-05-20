@@ -5,11 +5,8 @@
 import { supabaseClient } from '../supabase-client.js';
 
 export async function apiFetchRentalMessages(userLogin) {
-  const query = supabaseClient
-    .from('rental_messages')
-    .select('*')
-    .order('date', { ascending: false });
-  if (userLogin) query.eq('user_login', userLogin);
+  let query = supabaseClient.from('rental_messages').select('*');
+  if (userLogin) query = query.eq('user_login', userLogin);
   const { data, error } = await query;
   if (error) { console.error('apiFetchRentalMessages:', error); return []; }
   return data || [];

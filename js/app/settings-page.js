@@ -1,27 +1,26 @@
 /* ============================================================
-   js/settings-page.js — Сторінка налаштувань акаунту
-   ============================================================
-   Відповідає за:
-     - завантаження та збереження даних профілю (логін, email)
-     - зміну пароля
-     - завантаження/видалення аватара
-     - видалення акаунту
-   Залежності:
-     - api.js → apiFetchAccountByLogin, apiUpdateAccount,
-                apiDeleteAccount, apiUploadAvatar, apiFetchAccounts
-     - utils.js → isValidEmail
-     - ui.js    → applyAvatar, removeAvatarUI, checkStrength, showToast
+   js/settings-page.js — Налаштування акаунту (Supabase Auth)
    ============================================================ */
 
 import {
     apiFetchAccountByLogin, apiUpdateAccount,
     apiDeleteAccount, apiUploadAvatar, apiFetchAccounts,
 } from '../services/api.js';
-import { isValidEmail }                               from '../utils.js';
-import { applyAvatar, removeAvatarUI, checkStrength, showToast } from '../ui/index.js';
+import { supabaseClient }                                     from '../supabase-client.js';
+import { isValidEmail }                                       from '../utils.js';
+import { applyAvatar, removeAvatarUI, checkStrength, togglePw, triggerAvatarUpload, showToast } from '../ui/ui.js';
+import { syncCurrentUser }                                    from './auth.js';
 
 export async function initSettingsPage() {
+    // Виставляємо на window, бо HTML викликає їх через inline onclick/oninput
+    window.togglePw      = togglePw;
+    window.checkStrength = checkStrength;
+    window.triggerAvatarUpload = triggerAvatarUpload;
     let currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) { window.location.href = 'main.html'; return; }
+
+    // Завжди синхронізуємо з Supabase Auth при вході на сторінку
+    currentUser = await syncCurrentUser();
     if (!currentUser) { window.location.href = 'main.html'; return; }
 
     let originalLogin = currentUser.login;
@@ -30,15 +29,8 @@ export async function initSettingsPage() {
     document.getElementById('setEmail').value = currentUser.email  || '';
     document.getElementById('avatarInitial').textContent = (currentUser.login || '?')[0].toUpperCase();
 
-    // Завантажити актуальний аватар з БД
-    const accData = await apiFetchAccountByLogin(currentUser.login);
-    if (accData?.avatar_url) {
-        currentUser.avatar_url = accData.avatar_url;
-        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-        applyAvatar(accData.avatar_url);
-    }
+    if (currentUser.avatar_url) applyAvatar(currentUser.avatar_url);
 
-    // Оновлення ініціалу при зміні логіну
     document.getElementById('setLogin').oninput = function () {
         document.getElementById('avatarInitial').textContent = (this.value[0] || '?').toUpperCase();
     };
@@ -69,7 +61,7 @@ export async function initSettingsPage() {
         showToast('🗑 Фото видалено');
     };
 
-    /* ── Збереження даних акаунту ── */
+    /* ── Збереження даних акаунту (логін / email) ── */
 
     document.getElementById('saveAccountBtn').onclick = async () => {
         const btn   = document.getElementById('saveAccountBtn');
@@ -85,10 +77,22 @@ export async function initSettingsPage() {
         }
 
         btn.textContent = '⏳ Збереження...'; btn.disabled = true;
-        const error = await apiUpdateAccount(originalLogin, { login, email });
-        btn.textContent = '💾 Зберегти зміни'; btn.disabled = false;
 
-        if (error) return showToast('❌ Помилка: ' + error.message, 'error');
+        // Оновлюємо профіль
+        const profileError = await apiUpdateAccount(originalLogin, { login, email });
+
+        // Якщо email змінився — оновлюємо і в Supabase Auth
+        if (!profileError && email !== currentUser.email) {
+            const { error: authError } = await supabaseClient.auth.updateUser({ email });
+            if (authError) {
+                btn.textContent = '💾 Зберегти зміни'; btn.disabled = false;
+                return showToast('❌ Помилка зміни email: ' + authError.message, 'error');
+            }
+        }
+
+        btn.textContent = '💾 Зберегти зміни'; btn.disabled = false;
+        if (profileError) return showToast('❌ Помилка: ' + profileError.message, 'error');
+
         currentUser.login = login; currentUser.email = email;
         sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
         originalLogin = login;
@@ -105,43 +109,80 @@ export async function initSettingsPage() {
 
     /* ── Зміна пароля ── */
 
+    const savePasswordBtn  = document.getElementById('savePasswordBtn');
+    const currentPassInput = document.getElementById('currentPassword');
     const newPasswordInput = document.getElementById('newPassword');
-    if (newPasswordInput) {
-        newPasswordInput.addEventListener('input', e => checkStrength(e.target.value));
+    const confirmPassInput = document.getElementById('confirmPassword');
+
+    // Вмикає/вимикає кнопку залежно від стану полів
+    function updateSavePasswordBtn() {
+        const currentFilled  = currentPassInput && currentPassInput.value.length > 0;
+        const newPass        = newPasswordInput ? newPasswordInput.value : '';
+        const confirmPass    = confirmPassInput ? confirmPassInput.value : '';
+        const passwordsMatch = newPass.length > 0 && newPass === confirmPass;
+        savePasswordBtn.disabled = !(currentFilled && passwordsMatch);
     }
 
-    document.getElementById('savePasswordBtn').onclick = async () => {
-        const btn     = document.getElementById('savePasswordBtn');
-        const current = document.getElementById('currentPassword').value;
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', e => {
+            checkStrength(e.target.value);
+            updateSavePasswordBtn();
+        });
+    }
+    if (currentPassInput) currentPassInput.addEventListener('input', updateSavePasswordBtn);
+    if (confirmPassInput)  confirmPassInput.addEventListener('input', updateSavePasswordBtn);
+
+    // Встановлюємо початковий стан — кнопка заблокована
+    updateSavePasswordBtn();
+    savePasswordBtn.disabled = true;
+    savePasswordBtn.style.opacity = '0.5';
+    savePasswordBtn.style.cursor = 'not-allowed';
+
+    function validatePasswordBtn() {
+        const ok = currentPassInput?.value.length > 0 &&
+                   newPasswordInput?.value.length > 0 &&
+                   newPasswordInput?.value === confirmPassInput?.value;
+        savePasswordBtn.disabled = !ok;
+        savePasswordBtn.style.opacity = ok ? '1' : '0.5';
+        savePasswordBtn.style.cursor = ok ? 'pointer' : 'not-allowed';
+    }
+
+    currentPassInput?.addEventListener('input', validatePasswordBtn);
+    newPasswordInput?.addEventListener('input', validatePasswordBtn);
+    confirmPassInput?.addEventListener('input', validatePasswordBtn);
+    savePasswordBtn.onclick = async () => {
+        const btn     = savePasswordBtn;
         const newPass = document.getElementById('newPassword').value;
         const confirm = document.getElementById('confirmPassword').value;
 
-        if (!current || !newPass || !confirm) return showToast('⚠️ Заповніть всі поля', 'error');
-        if (current !== currentUser.password)  return showToast('⚠️ Поточний пароль невірний', 'error');
-        if (newPass.length < 6)               return showToast('⚠️ Новий пароль — мінімум 6 символів', 'error');
-        if (newPass !== confirm)              return showToast('⚠️ Паролі не збігаються', 'error');
+        // Supabase Auth не дозволяє перевірити поточний пароль на клієнті
+        // Поле currentPassword залишаємо для UX, але перевірку робить Supabase при signIn
+        if (!newPass || !confirm)   return showToast('⚠️ Заповніть поля пароля', 'error');
+        if (newPass.length < 6)     return showToast('⚠️ Мінімум 6 символів', 'error');
+        if (newPass !== confirm)    return showToast('⚠️ Паролі не збігаються', 'error');
 
         btn.textContent = '⏳ Збереження...'; btn.disabled = true;
-        const error = await apiUpdateAccount(currentUser.login, { password: newPass });
+        const { error } = await supabaseClient.auth.updateUser({ password: newPass });
         btn.textContent = '🔒 Змінити пароль'; btn.disabled = false;
 
         if (error) return showToast('❌ Помилка: ' + error.message, 'error');
-        currentUser.password = newPass;
-        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-        ['currentPassword', 'newPassword', 'confirmPassword'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        checkStrength('');
-        showToast('✅ Пароль успішно змінено!');
+
+        showToast('✅ Пароль змінено! Виконується вихід...');
+        setTimeout(async () => {
+            await supabaseClient.auth.signOut({ scope: 'local' });
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'main.html';
+        }, 1500);
     };
 
     /* ── Видалення акаунту ── */
 
     document.getElementById('deleteAccountBtn').onclick = async () => {
-        if (!confirm(`❗ Ви впевнені, що хочете видалити акаунт "${currentUser.login}"?\nЦю дію не можна скасувати.`)) return;
+        if (!confirm(`❗ Видалити акаунт "${currentUser.login}"? Цю дію не можна скасувати.`)) return;
+        // Видаляємо профіль (auth.users — каскадно або через Edge Function)
         const error = await apiDeleteAccount(currentUser.login);
         if (error) return showToast('❌ Помилка: ' + error.message, 'error');
+        await supabaseClient.auth.signOut();
         sessionStorage.removeItem('currentUser');
         window.location.href = 'main.html';
     };
@@ -156,7 +197,8 @@ export async function initSettingsPage() {
     if (loginBtn && userDropdown) {
         loginBtn.onclick = e => { e.preventDefault(); userDropdown.classList.toggle('active'); };
     }
-    document.getElementById('logoutBtn').onclick = () => {
+    document.getElementById('logoutBtn').onclick = async () => {
+        await supabaseClient.auth.signOut();
         sessionStorage.removeItem('currentUser');
         window.location.href = 'main.html';
     };
@@ -166,8 +208,6 @@ export async function initSettingsPage() {
             userDropdown.classList.remove('active');
         }
     };
-
-    /* ── Preloader ── */
 
     const preloader = document.getElementById('site-preloader');
     if (preloader) setTimeout(() => preloader.classList.add('hidden'), 900);

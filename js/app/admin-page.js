@@ -17,7 +17,7 @@
    ============================================================ */
 
 import {
-    apiFetchAccounts, apiInsertAccount, apiUpdateAccount, apiDeleteAccount,
+    apiFetchAccounts, apiUpdateAccount, apiDeleteAccount,
     apiFetchApartments, apiInsertApartment, apiUpdateApartment,
     apiDeleteApartment, apiUploadApartmentImage,
     apiFetchContactMessages, apiDeleteContactMessage,
@@ -27,7 +27,9 @@ import {
 import {
     renderUsersTable, renderAdminAptsTable,
     renderContactMessagesTable, renderRentalMessagesTable,
-} from '../ui/index.js';
+} from '../ui/ui.js';
+
+import { supabaseClient, SUPABASE_URL } from '../supabase-client.js';
 
 /* ── Стан ── */
 
@@ -165,13 +167,7 @@ function openModal(id)            { document.getElementById(id)?.classList.add('
 /* ── CRUD Користувачі ── */
 
 window.openUserModal = function () {
-    document.getElementById('userModalTitle').innerText = 'Додати користувача';
-    ['oldUserLogin', 'userLogin', 'userEmail', 'userPassword'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-    document.getElementById('userIsAdmin').checked = false;
-    openModal('userModal');
+    alert('Додавання користувачів можливе лише через реєстрацію на сайті.');
 };
 
 window.editUser = function (login) {
@@ -180,31 +176,44 @@ window.editUser = function (login) {
     document.getElementById('userModalTitle').innerText = 'Редагувати користувача';
     document.getElementById('oldUserLogin').value  = acc.login;
     document.getElementById('userLogin').value     = acc.login;
-    document.getElementById('userEmail').value     = acc.email    || '';
-    document.getElementById('userPassword').value  = acc.password || '';
+    document.getElementById('userEmail').value     = acc.email || '';
     document.getElementById('userIsAdmin').checked = !!acc.is_admin;
     openModal('userModal');
 };
 
 window.saveUser = async function () {
-    const login    = document.getElementById('userLogin')?.value.trim();
-    const email    = document.getElementById('userEmail')?.value.trim();
-    const password = document.getElementById('userPassword')?.value.trim();
-    const is_admin = document.getElementById('userIsAdmin')?.checked;
-    const oldLogin = document.getElementById('oldUserLogin')?.value.trim();
+    const login     = document.getElementById('userLogin')?.value.trim();
+    const email     = document.getElementById('userEmail')?.value.trim();
+    const is_admin  = document.getElementById('userIsAdmin')?.checked;
+    const oldLogin  = document.getElementById('oldUserLogin')?.value.trim();
+    const newPass   = document.getElementById('userNewPassword')?.value.trim();
 
-    if (!login || !password) return alert('Заповніть логін та пароль');
+    if (!login) return alert('Введіть логін');
 
-    let error;
-    if (oldLogin) {
-        error = await apiUpdateAccount(oldLogin, { login, email, password, is_admin });
-    } else {
-        const existing = await apiFetchAccounts();
-        if (existing.find(a => a.login === login)) return alert('Логін вже зайнятий');
-        error = await apiInsertAccount({ login, email, password, is_admin });
+    // Оновлюємо профіль
+    const error = await apiUpdateAccount(oldLogin, { login, email, is_admin });
+    if (error) return alert('Помилка: ' + error.message);
+
+    // Якщо введено пароль — міняємо через Edge Function
+    if (newPass) {
+        if (newPass.length < 6) return alert('Мінімум 6 символів');
+
+        // Знаходимо userId по логіну
+        const acc = adminAccounts.find(a => a.login === oldLogin);
+        if (!acc?.id) return alert('ID користувача не знайдено');
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/smooth-task`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ userId: acc.id, newPassword: newPass }),
+        });
+        if (!res.ok) return alert('Помилка зміни пароля');
     }
 
-    if (error) { console.error(error); return alert('Помилка: ' + error.message); }
     window.closeModal('userModal');
     loadAdminData();
 };
@@ -376,3 +385,4 @@ export function initAdminPage() {
     initAptFilters();
     loadAdminData();
 }
+

@@ -18,3 +18,4 @@ if (!url || !key) {
 }
 
 export const supabaseClient = createClient(url, key);
+export const SUPABASE_URL = 'https://xjeuqinimbiwmdyjraih.supabase.co';

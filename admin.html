@@ -19,7 +19,6 @@
     
     <div class="admin-header">
         <h2>Користувачі</h2>
-        <button class="add-btn" onclick="openUserModal()">+ Додати користувача</button>
     </div>
     <div style="overflow-x: auto;">
         <table class="admin-table" id="usersTable">
@@ -131,12 +130,13 @@
 <div class="modal-overlay" id="userModal">
     <div class="auth-modal">
         <button class="close-btn" onclick="closeModal('userModal')">&#10006;</button>
-        <h2 id="userModalTitle">Користувач</h2>
+        <h2 id="userModalTitle">Редагувати користувача</h2>
         <div class="auth-form">
             <input type="hidden" id="oldUserLogin">
-            <input type="text" id="userLogin" placeholder="Логін">
+            <input type="text"  id="userLogin" placeholder="Логін">
             <input type="email" id="userEmail" placeholder="Email">
-            <input type="text" id="userPassword" placeholder="Пароль">
+            <input type="password" id="userNewPassword" 
+                    placeholder="Новий пароль (Порожній = без змін)">
             <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                 <input type="checkbox" id="userIsAdmin"> Адміністратор
             </label>

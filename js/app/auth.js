@@ -1,21 +1,23 @@
 /* ============================================================
-   js/auth.js — Логіка авторизації та реєстрації
+   js/auth.js — Логіка авторизації через Supabase Auth
    ============================================================
-   Відповідає за:
-     - вхід / реєстрацію / вихід користувача
-     - підключення обробників подій для auth-модального вікна
+   Замінює пряму роботу з таблицею accounts на supabase.auth.*
    Залежності:
-     - api.js       → apiFetchAccounts, apiInsertAccount
-     - utils.js     → isValidEmail
-     - ui.js        → updateAuthUI, setAuthMode, showToast
+     - supabase-client.js → supabaseClient
+     - utils.js           → isValidEmail
+     - ui/index.js        → updateAuthUI, setAuthMode, showToast
    ============================================================ */
 
-import { apiFetchAccounts, apiInsertAccount } from '../services/api.js';
-import { isValidEmail }                        from '../utils.js';
-import { updateAuthUI, setAuthMode, showToast } from '../ui/index.js';
+import { supabaseClient }                        from '../supabase-client.js';
+import { isValidEmail }                          from '../utils.js';
+import { updateAuthUI, setAuthMode, showToast }  from '../ui/ui.js';
 
 /* ── Поточний користувач ── */
 
+/**
+ * Повертає об'єкт { login, email, is_admin, avatar_url, id } або null.
+ * Читається із sessionStorage для синхронного доступу.
+ */
 export function getCurrentUser() {
     const raw = sessionStorage.getItem('currentUser');
     return raw ? JSON.parse(raw) : null;
@@ -29,6 +31,31 @@ export function clearCurrentUser() {
     sessionStorage.removeItem('currentUser');
 }
 
+/**
+ * Завантажує профіль із таблиці profiles та зберігає у sessionStorage.
+ * Викликати після будь-якого auth-події.
+ */
+export async function syncCurrentUser() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { clearCurrentUser(); return null; }
+
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('login, is_admin, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+    const currentUser = {
+        id:         user.id,
+        email:      user.email,
+        login:      profile?.login   ?? user.email,
+        is_admin:   profile?.is_admin ?? false,
+        avatar_url: profile?.avatar_url ?? null,
+    };
+    setCurrentUser(currentUser);
+    return currentUser;
+}
+
 /* ── Обробники форм ── */
 
 export async function handleSignIn() {
@@ -37,17 +64,33 @@ export async function handleSignIn() {
 
     if (!login || !password) return alert('Введіть логін та пароль');
 
-    const accounts = await apiFetchAccounts();
-    const user     = accounts.find(a => a.login === login && a.password === password);
+    // Знаходимо email за логіном через profiles
+    const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('id')
+        .eq('login', login)
+        .single();
 
-    if (user) {
-        setCurrentUser(user);
-        document.getElementById('authOverlay')?.classList.remove('active');
-        updateAuthUI();
-        showToast('Вхід виконано!');
-    } else {
-        alert('Невірний логін або пароль');
-    }
+    if (profileError || !profile) return alert('Користувача з таким логіном не знайдено');
+
+    // Отримуємо email через RPC або беремо з auth (потрібна service key — тому краще зберігати email у profiles)
+    // Простіше рішення: зберігаємо email у profiles при реєстрації
+    const { data: profileFull } = await supabaseClient
+        .from('profiles')
+        .select('email')
+        .eq('login', login)
+        .single();
+
+    const email = profileFull?.email;
+    if (!email) return alert('Не вдалося знайти email для цього логіну');
+
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) return alert('Невірний логін або пароль');
+
+    await syncCurrentUser();
+    document.getElementById('authOverlay')?.classList.remove('active');
+    updateAuthUI();
+    showToast('Вхід виконано!');
 }
 
 export async function handleRegister() {
@@ -60,31 +103,51 @@ export async function handleRegister() {
     if (!login || !password)  return alert('Заповніть логін та пароль');
     if (password.length < 6)  return alert('Пароль повинен містити мінімум 6 символів');
 
-    const accounts = await apiFetchAccounts();
-    if (accounts.find(a => a.login === login)) return alert('Логін вже зайнятий');
+    // Перевірка унікальності логіну
+    const { data: existing } = await supabaseClient
+        .from('profiles')
+        .select('id')
+        .eq('login', login)
+        .single();
+    if (existing) return alert('Логін вже зайнятий');
 
-    const error = await apiInsertAccount({ login, password, email, is_admin: false });
-    if (error) { console.error(error); return; }
+    // Реєстрація через Supabase Auth
+    const { data, error } = await supabaseClient.auth.signUp({
+       email,
+       password,
+       options: { data: { login } },
+    });
+    if (error) { alert('Помилка реєстрації: ' + error.message); return; }
 
-    alert('Успішно зареєстровано! Тепер увійдіть.');
+    // Зберігаємо login + email у profiles (upsert — на випадок якщо тригер ще не встиг створити рядок)
+    if (data?.user) {
+        await supabaseClient
+            .from('profiles')
+            .upsert({ id: data.user.id, login, email }, { onConflict: 'id' });
+    }
+
+    // ✅ Без підтвердження — одразу синхронізуємо і закриваємо
+    await syncCurrentUser();
+    document.getElementById('authOverlay')?.classList.remove('active');
+    updateAuthUI();
+    showToast('Успішно зареєстровано!');
+    // Прибрати старий alert з "Перевірте пошту"
+
+    alert('Успішно зареєстровано!');
     setAuthMode(false);
 }
 
-export function handleLogout() {
+export async function handleLogout() {
+    await supabaseClient.auth.signOut();
     clearCurrentUser();
     window.location.reload();
 }
 
 /* ── Ініціалізація auth-блоку (спільна для всіх сторінок) ── */
 
-/**
- * Підключає обробники до елементів авторизації.
- * Викликати з DOMContentLoaded кожної сторінки, де є auth-модалка.
- *
- * @param {object} options
- * @param {Function} [options.onLogin]  — додатковий колбек після успішного входу
- */
-export function initAuth({ onLogin } = {}) {
+export async function initAuth({ onLogin } = {}) {
+    // Відновлюємо сесію при завантаженні сторінки
+    await syncCurrentUser();
     updateAuthUI();
     setAuthMode(false);
 
@@ -121,7 +184,6 @@ export function initAuth({ onLogin } = {}) {
     if (switchReg)   switchReg.onclick   = e => { e.preventDefault(); setAuthMode(true); };
     if (logoutBtn)   logoutBtn.onclick   = e => { e.preventDefault(); handleLogout(); };
 
-    /* Закриття dropdown і модалки кліком поза ними */
     document.addEventListener('click', e => {
         if (userDropdown && loginBtn &&
             !userDropdown.contains(e.target) && e.target !== loginBtn) {

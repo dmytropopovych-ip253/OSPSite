@@ -10,7 +10,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        index:     resolve(__dirname, 'main.html'),
+        index:     resolve(__dirname, 'index.html'),
         search:    resolve(__dirname, 'search.html'),
         apartment: resolve(__dirname, 'apartment.html'),
         admin:     resolve(__dirname, 'admin.html'),

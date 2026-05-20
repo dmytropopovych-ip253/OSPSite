@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STRIVE — Профіль</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -17,7 +18,7 @@
     <div class="container nav-wrapper">
         <div class="logo">STRIVE <span>Оренда житла</span></div>
         <div class="nav-links" id="navAuthBlock">
-            <a href="main.html">Головна</a>
+            <a href="index.html">Головна</a>
             <a href="search.html">Пошук</a>
             <a href="#" id="contactsBtn">Контакти</a>
             <div id="userMenuWrapper" class="user-menu-wrapper">
@@ -34,45 +35,73 @@
     </div>
 </nav>
 
-<div class="container profile-page">
-    <div class="profile-page-title">
-        Мій профіль
+<div class="container settings-page">
+
+    <div class="settings-page-header">
+        <h1>👤 Мій профіль</h1>
         <a href="settings.html">⚙ Налаштування</a>
+        <style>
+            .settings-page-header a { border:1.5px solid var(--brand,#2d7a7a); border-radius:50px; padding:8px 20px; font-size:0.93rem; font-weight:600; color:var(--brand,#2d7a7a); text-decoration:none; transition:background .18s,color .18s; }
+            .settings-page-header a:hover { background:var(--brand,#2d7a7a); color:#fff; }
+        </style>
     </div>
 
-    <div class="profile-grid">
-        <div>
-            <div class="profile-card" id="profileCard">
-                <div class="profile-avatar-big" id="profileAvatar" style="position:relative;overflow:hidden;">
-                    <span id="profileAvatarInitial">?</span>
-                    <img id="profileAvatarImg" src="" alt="" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">
-                </div>
-                <div class="profile-username" id="profileUsername">—</div>
-                <div class="profile-email" id="profileEmail">—</div>
-                <div id="profileBadgeWrap"></div>
-                <div class="profile-stats">
-                    <div class="p-stat">
-                        <span class="p-stat-num" id="statMsgCount">0</span>
-                        <span class="p-stat-label">Повідомлень</span>
-                    </div>
-                    <div class="p-stat">
-                        <span class="p-stat-num" id="statRole">—</span>
-                        <span class="p-stat-label">Роль</span>
-                    </div>
-                </div>
-                <div class="profile-actions">
-                    <a href="settings.html" class="profile-action-btn">⚙ Налаштування акаунта</a>
-                    <button class="profile-action-btn danger" id="profileLogoutBtn">↩ Вийти</button>
-                </div>
+    <!-- ─── AVATAR & IDENTITY ─── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <div class="card-header-icon icon-blue">🪪</div>
+            <div class="card-header-text">
+                <h2>Інформація акаунта</h2>
+                <p>Ваш аватар, логін та роль на платформі</p>
             </div>
         </div>
-
-        <div class="messages-panel">
-            <div class="messages-header">
-                <h2>Мої повідомлення по оренді</h2>
-                <span class="msg-count-badge" id="msgBadge">0</span>
+        <div class="settings-card-body">
+            <div class="avatar-section">
+                <div class="avatar-wrap">
+                    <div class="avatar-circle" id="profileAvatar" style="cursor:default;">
+                        <span id="profileAvatarInitial">?</span>
+                        <img id="profileAvatarImg" src="" alt="" style="display:none;">
+                    </div>
+                </div>
+                <div class="avatar-info">
+                    <h3 id="profileUsername" style="font-size:1.3rem;font-weight:700;margin:0 0 4px;">—</h3>
+                    <p id="profileEmail" style="color:var(--text-muted,#888);margin:0 0 10px;font-size:0.95rem;">—</p>
+                    <div id="profileBadgeWrap"></div>
+                </div>
             </div>
-            <div class="messages-list" id="messagesList">
+
+            <div class="fields-row" style="margin-top:20px;">
+                <div class="settings-field">
+                    <label>📊 Повідомлень надіслано</label>
+                    <div class="settings-input" style="display:flex;align-items:center;gap:10px;cursor:default;">
+                        <span style="font-size:1.4rem;font-weight:700;color:var(--brand,#4f46e5);" id="statMsgCount">0</span>
+                        <span style="color:#888;font-size:0.9rem;">запитів на оренду</span>
+                    </div>
+                </div>
+                <div class="settings-field">
+                    <label>🎖 Роль у системі</label>
+                    <div class="settings-input" style="display:flex;align-items:center;gap:8px;cursor:default;">
+                        <span style="font-weight:600;" id="statRole">—</span>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- ─── RENTAL MESSAGES ─── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <div class="card-header-icon icon-green">📨</div>
+            <div class="card-header-text">
+                <h2>Мої повідомлення по оренді</h2>
+                <p>Запити, які ви надсилали власникам квартир</p>
+            </div>
+            <span class="msg-count-badge" id="msgBadge" style="margin-left:auto;">0</span>
+        </div>
+        <div class="settings-card-body">
+            <div id="messagesList">
                 <div class="empty-profile">
                     <div class="empty-icon">📭</div>
                     <p>Завантаження...</p>
@@ -80,7 +109,10 @@
             </div>
         </div>
     </div>
+
 </div>
+
+<div class="toast" id="toast"></div>
 
 <footer class="footer">
     <div class="container footer-content">

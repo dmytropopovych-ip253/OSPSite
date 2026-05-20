@@ -102,7 +102,7 @@
 .icon-arrow { width: 18px; height: 18px; fill: white; transition: transform 0.3s ease; }
 .sort-wrapper.active .icon-arrow { transform: rotate(180deg); }
 
-.price-panel { left: 0; width: 270px; z-index: 300; }
+.price-panel { left: 0; width: 315px; z-index: 300; }
 .sort-dropdown { right: 0; width: 210px; padding: 8px 0; z-index: 300; }
 .apply-btn { display: none; }
 

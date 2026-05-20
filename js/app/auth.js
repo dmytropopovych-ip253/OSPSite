@@ -10,7 +10,7 @@
 
 import { supabaseClient }                        from '../supabase-client.js';
 import { isValidEmail }                          from '../utils.js';
-import { updateAuthUI, setAuthMode, showToast }  from '../ui/ui.js';
+import { updateAuthUI, setAuthMode, showToast }  from '../ui/index.js';
 
 /* ── Поточний користувач ── */
 

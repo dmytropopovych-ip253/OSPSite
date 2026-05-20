@@ -1,17 +1,5 @@
 /* ============================================================
    js/app.js — Точка входу (entry point)
-   ============================================================
-   Єдина відповідальність: визначити поточну сторінку по URL
-   та передати керування відповідному модулю.
-
-   Логіка сторінок більше тут не живе — вона у:
-     search    → filters/search-page.js (фільтри, сортування, модал квартири)
-     apartment → apartment-page.js
-     admin     → admin-page.js
-     settings  → settings-page.js
-     profile   → profile-page.js
-   Auth і contacts — спільні для всіх сторінок:
-     auth.js, contacts.js
    ============================================================ */
 
 import {
@@ -28,7 +16,7 @@ import {
 
 import {
     renderCurrentPage, updateAuthUI, setAuthMode, showPageLoading,
-} from '../ui/ui.js';
+} from '../ui/index.js';
 
 import { initAuth }            from './auth.js';
 import { initContactsModal }   from './contacts.js';
@@ -38,7 +26,7 @@ import { initSettingsPage }    from './settings-page.js';
 import { initProfilePage }     from './profile-page.js';
 
 /* ════════════════════════════════════════════════════════════
-   SEARCH PAGE — фільтри, сортування, модал додавання квартири
+   SEARCH PAGE
    ════════════════════════════════════════════════════════════ */
 
 function applyFiltersAndSort() {
@@ -251,7 +239,6 @@ function initSearchPage() {
     if (closeApartmentModal) closeApartmentModal.onclick = () =>
         document.getElementById('apartmentModalOverlay')?.classList.remove('active');
 
-    // Filter & sort panel toggles
     const filterBtn   = document.getElementById('openFilters');
     const filterPanel = document.getElementById('filterPanel');
     const sortInput   = document.getElementById('openSort');
@@ -293,7 +280,7 @@ function initSearchPage() {
 }
 
 /* ════════════════════════════════════════════════════════════
-   DOMContentLoaded — визначаємо сторінку і делегуємо
+   DOMContentLoaded
    ════════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -308,9 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (page === 'apartment') { initAuth(); initContactsModal(); initApartmentPage(); }
     if (page === 'admin')     initAdminPage();
     if (page === 'settings')  initSettingsPage();
-    if (page === 'profile')   initProfilePage();
+    if (page === 'profile')   { initAuth(); initContactsModal(); initProfilePage(); }
 
-    // Гарантовано ховаємо preloader для всіх сторінок
     const preloaderGlobal = document.getElementById('site-preloader');
     if (preloaderGlobal) {
         setTimeout(() => preloaderGlobal.classList.add('hidden'), 1200);

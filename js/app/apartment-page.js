@@ -11,7 +11,7 @@
                   apiUpdateApartment, apiDeleteApartment,
                   apiUploadApartmentImage, apiInsertRentalMessage
      - utils.js → isValidEmail, formatDate
-     - ui.js    → renderAptCard, renderRecommendationCards
+     - index.js    → renderAptCard, renderRecommendationCards
      - auth.js  → getCurrentUser
    ============================================================ */
 
@@ -21,7 +21,7 @@ import {
     apiUploadApartmentImage, apiInsertRentalMessage,
 } from '../services/api.js';
 import { isValidEmail, formatDate }              from '../utils.js';
-import { renderAptCard, renderRecommendationCards } from '../ui/ui.js';
+import { renderAptCard, renderRecommendationCards } from '../ui/index.js';
 import { getCurrentUser }                        from './auth.js';
 
 let currentApt = null;

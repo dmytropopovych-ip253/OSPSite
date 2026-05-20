@@ -3,14 +3,13 @@
    ============================================================ */
 
 import { apiFetchRentalMessages, apiFetchApartments } from '../services/api.js';
-import { renderProfileMessages }                      from '../ui/ui.js';
+import { renderProfileMessages }                      from '../ui/index.js';
 import { supabaseClient }                             from '../supabase-client.js';
 import { syncCurrentUser }                            from './auth.js';
 
 export async function initProfilePage() {
-    // Синхронізуємо сесію Supabase Auth → sessionStorage
     const currentUser = await syncCurrentUser();
-    if (!currentUser) { window.location.href = 'main.html'; return; }
+    if (!currentUser) { window.location.href = 'index.html'; return; }
 
     document.getElementById('profileUsername').textContent = currentUser.login;
     document.getElementById('profileEmail').textContent    = currentUser.email || 'Email не вказано';
@@ -50,28 +49,13 @@ export async function initProfilePage() {
     }
     renderProfileMessages(list, aptsMap);
 
-    /* ── Логаут ── */
-    document.getElementById('profileLogoutBtn').onclick = async () => {
-        await supabaseClient.auth.signOut();
-        sessionStorage.removeItem('currentUser');
-        window.location.href = 'main.html';
-    };
-
-    /* ── Navbar ── */
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) loginBtn.textContent = currentUser.login;
-    const adminPanelLink = document.getElementById('adminPanelLink');
-    if (currentUser.is_admin && adminPanelLink) adminPanelLink.style.display = 'block';
-    const userDropdown = document.getElementById('userDropdown');
-    if (loginBtn && userDropdown) {
-        loginBtn.onclick = e => { e.preventDefault(); userDropdown.classList.toggle('active'); };
-    }
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.onclick = async () => {
+    /* ── Логаут (тільки кнопка у картці, navbar веде initAuth) ── */
+    const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+    if (profileLogoutBtn) {
+        profileLogoutBtn.onclick = async () => {
             await supabaseClient.auth.signOut();
             sessionStorage.removeItem('currentUser');
-            window.location.href = 'main.html';
+            window.location.href = 'index.html';
         };
     }
 

@@ -12,7 +12,7 @@
                 apiUpdateApartment, apiDeleteApartment, apiUploadApartmentImage,
                 apiFetchContactMessages, apiDeleteContactMessage,
                 apiFetchRentalMessages, apiDeleteRentalMessage
-     - ui.js  → renderUsersTable, renderAdminAptsTable,
+     - index.js  → renderUsersTable, renderAdminAptsTable,
                 renderContactMessagesTable, renderRentalMessagesTable
    ============================================================ */
 
@@ -27,7 +27,7 @@ import {
 import {
     renderUsersTable, renderAdminAptsTable,
     renderContactMessagesTable, renderRentalMessagesTable,
-} from '../ui/ui.js';
+} from '../ui/index.js';
 
 import { supabaseClient, SUPABASE_URL } from '../supabase-client.js';
 

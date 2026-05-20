@@ -8,7 +8,7 @@ import {
 } from '../services/api.js';
 import { supabaseClient }                                     from '../supabase-client.js';
 import { isValidEmail }                                       from '../utils.js';
-import { applyAvatar, removeAvatarUI, checkStrength, togglePw, triggerAvatarUpload, showToast } from '../ui/ui.js';
+import { applyAvatar, removeAvatarUI, checkStrength, togglePw, triggerAvatarUpload, showToast } from '../ui/index.js';
 import { syncCurrentUser }                                    from './auth.js';
 
 export async function initSettingsPage() {
@@ -17,11 +17,11 @@ export async function initSettingsPage() {
     window.checkStrength = checkStrength;
     window.triggerAvatarUpload = triggerAvatarUpload;
     let currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    if (!currentUser) { window.location.href = 'main.html'; return; }
+    if (!currentUser) { window.location.href = 'index.html'; return; }
 
     // Завжди синхронізуємо з Supabase Auth при вході на сторінку
     currentUser = await syncCurrentUser();
-    if (!currentUser) { window.location.href = 'main.html'; return; }
+    if (!currentUser) { window.location.href = 'index.html'; return; }
 
     let originalLogin = currentUser.login;
 
@@ -171,7 +171,7 @@ export async function initSettingsPage() {
         setTimeout(async () => {
             await supabaseClient.auth.signOut({ scope: 'local' });
             sessionStorage.removeItem('currentUser');
-            window.location.href = 'main.html';
+            window.location.href = 'index.html';
         }, 1500);
     };
 
@@ -184,7 +184,7 @@ export async function initSettingsPage() {
         if (error) return showToast('❌ Помилка: ' + error.message, 'error');
         await supabaseClient.auth.signOut();
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'main.html';
+        window.location.href = 'index.html';
     };
 
     /* ── Navbar ── */
@@ -200,7 +200,7 @@ export async function initSettingsPage() {
     document.getElementById('logoutBtn').onclick = async () => {
         await supabaseClient.auth.signOut();
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'main.html';
+        window.location.href = 'index.html';
     };
     document.onclick = e => {
         if (userDropdown && loginBtn &&

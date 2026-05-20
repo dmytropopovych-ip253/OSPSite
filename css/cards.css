@@ -1,0 +1,113 @@
+/* ── Apartments Grid ── */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin-top: 36px;
+    padding-bottom: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Card ── */
+.card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--brand-light);
+    z-index: 2;
+}
+
+.card-img-container { position: relative; overflow: hidden; }
+.card img, .card-img-container img {
+    width: 100%; height: 195px;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+    display: block;
+}
+.card:hover .card-img-container img { transform: scale(1.06); }
+
+.card-content { padding: 18px 20px 20px; flex-grow: 1; display: flex; flex-direction: column; }
+.card-title { font-size: 15.5px; font-weight: 600; margin: 0 0 14px; color: var(--text-main); line-height: 1.35; }
+
+.info-block { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; flex-grow: 1; }
+.info-line { display: flex; align-items: baseline; font-size: 13px; gap: 6px; }
+.label {
+    color: var(--text-light); font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    white-space: nowrap; flex-shrink: 0; min-width: 64px;
+}
+.val { color: var(--text-muted); font-weight: 400; font-size: 13px; }
+
+.card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 14px; margin-top: auto;
+    flex-wrap: wrap; gap: 8px;
+}
+.price { font-family: var(--ff-display); font-size: 21px; font-weight: 700; color: var(--brand); line-height: 1; }
+
+.buy-btn {
+    padding: 8px 20px; border-radius: 50px;
+    font-size: 13px; font-weight: 600; font-family: var(--ff-body);
+    cursor: pointer; background: var(--brand-pale); color: var(--brand);
+    border: 1.5px solid var(--brand-light); transition: all 0.2s ease;
+    outline: none;
+}
+.buy-btn:hover {
+    background: var(--brand); color: white; border-color: var(--brand);
+    box-shadow: 0 4px 14px rgba(44,122,155,0.35); transform: translateY(-1px);
+}
+
+/* ── Admin Card Actions ── */
+.admin-actions { display: none; width: 100%; gap: 8px; margin-top: 12px; }
+.admin-mode .admin-actions { display: flex; }
+
+.admin-btn {
+    flex: 1; padding: 8px; border: none; cursor: pointer;
+    font-weight: 600; font-family: var(--ff-body); font-size: 13px;
+    border-radius: var(--radius-sm); color: white; transition: all 0.2s ease;
+}
+.edit-btn { background: var(--brand); }
+.delete-btn { background: #e53e3e; }
+.admin-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* ── Add Apartment Button ── */
+.add-apt-btn {
+    margin: 0 0 24px; padding: 12px 28px;
+    background: linear-gradient(135deg, var(--accent), #3aaf8a);
+    color: white; border: none; font-size: 14.5px; font-weight: 700;
+    font-family: var(--ff-body); border-radius: 50px; cursor: pointer;
+    transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(78,203,164,0.35);
+}
+.add-apt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(78,203,164,0.45); }
+
+/* ── Apartment Modal ── */
+.apartment-modal { max-width: 500px; }
+
+/* ── Pagination ── */
+.pagination {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin-top: 48px; margin-bottom: 32px; flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 40px; height: 40px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 50%; font-size: 14px; font-family: var(--ff-body);
+    font-weight: 500; color: var(--text-muted); cursor: pointer; padding: 0;
+    transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: center;
+}
+.page-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-pale); }
+.page-btn.active { background: var(--brand); color: white; border-color: var(--brand); box-shadow: 0 3px 10px rgba(44,122,155,0.35); }

@@ -8,20 +8,24 @@ import { apiInsertContactMessage } from '../services/api.js';
 
 function prefillContactForm() {
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    const emailInput  = document.getElementById('contactEmail');
     const nameInput   = document.getElementById('contactName');
-    const emailWrap   = document.getElementById('contactEmail')
-        ?.closest?.('.form-group, label, .input-wrap, .field');
 
-    // Ховаємо поле email повністю — пошта береться з акаунту
-    const emailInput = document.getElementById('contactEmail');
-    if (emailInput) {
-        const wrap = emailInput.closest('.form-group, label, .input-wrap, .field');
-        if (wrap) wrap.style.display = 'none';
-        else      emailInput.style.display = 'none';
-    }
-
-    if (currentUser && nameInput && !nameInput.value) {
-        nameInput.value = currentUser.login || '';
+    if (currentUser) {
+        // Залогінений — ховаємо email, підставляємо логін
+        if (emailInput) {
+            const wrap = emailInput.closest('.form-group, label, .input-wrap, .field');
+            if (wrap) wrap.style.display = 'none';
+            else      emailInput.style.display = 'none';
+        }
+        if (nameInput && !nameInput.value) nameInput.value = currentUser.login || '';
+    } else {
+        // Не залогінений — показуємо поле email
+        if (emailInput) {
+            const wrap = emailInput.closest('.form-group, label, .input-wrap, .field');
+            if (wrap) wrap.style.display = '';
+            else      emailInput.style.display = '';
+        }
     }
 }
 
@@ -36,7 +40,7 @@ export async function handleSendContact() {
         || '';
 
     if (!name || !message) return alert('Заповніть всі поля.');
-    if (!email)            return alert('Не вдалося визначити пошту. Увійдіть в акаунт.');
+    if (!email)            return alert('Будь ласка, введіть вашу пошту.');
 
     const error = await apiInsertContactMessage({
         name, email, message,
@@ -45,8 +49,10 @@ export async function handleSendContact() {
     if (error) { console.error(error); return; }
 
     alert(`Дякуємо, ${name}! Повідомлення надіслано.`);
-    const msgEl = document.getElementById('contactMessage');
-    if (msgEl) msgEl.value = '';
+    ['contactName', 'contactEmail', 'contactMessage'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
     document.getElementById('contactOverlay')?.classList.remove('active');
 }
 
@@ -72,7 +78,6 @@ export function initContactsModal() {
         sendContactBtn.onclick = handleSendContact;
     }
 
-    // Закриття кліком на оверлей
     document.addEventListener('click', e => {
         if (contactOverlay && e.target === contactOverlay) {
             contactOverlay.classList.remove('active');

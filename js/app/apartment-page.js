@@ -1,18 +1,5 @@
 /* ============================================================
    js/apartment-page.js — Сторінка деталей квартири
-   ============================================================
-   Відповідає за:
-     - завантаження та відображення деталей квартири
-     - режим редагування (edit mode toggle)
-     - форму запиту оренди (landlord modal)
-     - блок рекомендацій
-   Залежності:
-     - api.js   → apiFetchApartmentById, apiFetchApartments,
-                  apiUpdateApartment, apiDeleteApartment,
-                  apiUploadApartmentImage, apiInsertRentalMessage
-     - utils.js → isValidEmail, formatDate
-     - index.js    → renderAptCard, renderRecommendationCards
-     - auth.js  → getCurrentUser
    ============================================================ */
 
 import {
@@ -123,10 +110,11 @@ async function handleSendLandlordMsg() {
 
     const error = await apiInsertRentalMessage({
         message_id:    crypto.randomUUID(),
-        name, email,
+        name,
+        email,
         message:       message || '—',
         apartment_id:  aptId,
-        user_login:    user ? user.login : null,
+        user_login:    user ? user.login : '',   // ← порожній рядок замість null
         date_from:     dateFromV,
         date_to:       dateToV,
         rental_period: dateLabel,
@@ -154,7 +142,6 @@ async function handleSendLandlordMsg() {
 export function initApartmentPage() {
     renderApartmentDetails();
 
-    // Edit mode toggle
     const toggle = document.getElementById('editModeToggle');
     if (toggle) {
         toggle.addEventListener('change', e => {
@@ -163,7 +150,6 @@ export function initApartmentPage() {
         });
     }
 
-    // Landlord form — дати
     const sendBtn  = document.getElementById('sendLandlordMsg');
     if (sendBtn) {
         const today    = new Date().toISOString().split('T')[0];
